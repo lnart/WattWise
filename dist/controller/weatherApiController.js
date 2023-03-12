@@ -1,13 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-async function getWeatherData() {
+async function getWeatherData(start, end) {
     try {
-        let response = await fetch('https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Wermelskirchen/2023-02-11/2023-03-11?unitGroup=metric&include=days%2Ccurrent&key=NP2FELSQW3GM3CKAP3EQQPJHZ&contentType=json');
+        let response = await fetch(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Wermelskirchen/${start}/${end}?unitGroup=metric&include=days%2Ccurrent&key=NP2FELSQW3GM3CKAP3EQQPJHZ&contentType=json`);
         if (!response.ok) {
             throw new Error(`HTTP Error! Status: ${response.status}`);
         }
         let data = await response.json();
-        console.log(data);
         return data;
     }
     catch (error) {
@@ -15,5 +14,13 @@ async function getWeatherData() {
         return null;
     }
 }
-getWeatherData();
+async function formatWeatherData(start, end) {
+    let data = await getWeatherData(start, end);
+    let formattedTemps = [];
+    for (let i = 0; i < data.days.length; i++) {
+        formattedTemps.push({ datetime: data.days[i]['datetime'], tempmax: data.days[i]['tempmax'], tempmin: data.days[i]['tempmin'] });
+    }
+    return formattedTemps;
+}
+formatWeatherData('2023-02-11', '2023-03-11');
 //# sourceMappingURL=weatherApiController.js.map
