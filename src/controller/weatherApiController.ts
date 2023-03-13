@@ -1,6 +1,6 @@
 import get from 'https'
 
-async function getWeatherData(start: String, end: String) {
+export async function getWeatherData(start: String, end: String) {
     try{
         let response = await fetch(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Wermelskirchen/${start}/${end}?unitGroup=metric&include=days%2Ccurrent&key=NP2FELSQW3GM3CKAP3EQQPJHZ&contentType=json`);
         if(!response.ok){
@@ -14,7 +14,7 @@ async function getWeatherData(start: String, end: String) {
     }
 }
 
-async function formatWeatherData(start: String, end: String){
+export async function formatWeatherData(start: String, end: String){
     let data = await getWeatherData(start, end)
     let formattedTemps = []
     for(let i = 0; i < data.days.length; i++){
@@ -22,5 +22,9 @@ async function formatWeatherData(start: String, end: String){
     }
     return formattedTemps
 }
+formatWeatherData('2023-03-12', '2023-3-13')
 
-formatWeatherData('2023-02-11', '2023-03-11')
+module.exports = {
+    formatWeatherData, 
+    getWeatherData
+}
