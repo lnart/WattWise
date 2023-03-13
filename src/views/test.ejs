@@ -1,0 +1,120 @@
+
+<style>
+.angry-grid {
+  display: grid;
+  grid-template-rows: auto 45px 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 70px 1fr 1fr 1fr 1fr 1fr 1fr 1fr 0px;
+  gap: 30px;
+  height: 100%;
+  padding: 20px; /* Add padding to the container to create margin */
+}
+
+.angry-grid > div {
+  border-radius: 20px; /* Add rounded corners to each grid area */
+}
+
+#item-1 {
+  grid-row-start: 1;
+  grid-column-start: 1;
+  grid-row-end: 8;
+  grid-column-end: 2;
+  width: 70px; /* Set the width of item-1 to 70px */
+  background-color: aqua;
+}
+
+#item-0 {
+  height: 50px;
+  grid-row-start: 1;
+  grid-column-start: 2;
+  grid-row-end: 2;
+  grid-column-end: 9;
+  background-color:black
+}
+
+#item-2 {
+  grid-row-start: 2;
+  grid-column-start: 2;
+  grid-row-end: 4;
+  grid-column-end: 4;
+  background-color:blue
+}
+
+#item-3 {
+  grid-row-start: 4;
+  grid-column-start: 2;
+  grid-row-end: 8;
+  grid-column-end: 8;
+  background-color:blueviolet
+}
+
+#item-4 {
+  grid-row-start: 2;
+  grid-column-start: 4;
+  grid-row-end: 4;
+  grid-column-end: 6;
+  background-color:brown
+}
+
+#item-5 {
+  grid-row-start: 2;
+  grid-column-start: 6;
+  grid-row-end: 4;
+  grid-column-end: 8;
+  background-color:cadetblue
+}
+
+#item-6 {
+  grid-row-start: 2;
+  grid-column-start: 8;
+  grid-row-end: 5;
+  grid-column-end: 9;
+  background-color:chartreuse
+}
+
+#item-7 {
+  grid-row-start: 5;
+  grid-column-start: 8;
+  grid-row-end: 8;
+  grid-column-end: 9;
+  background-color:turquoise
+}
+
+
+    </style>
+    
+    <div class="angry-grid">
+      <div id="item-0">&nbsp;
+        <div class="load-bar">
+
+        </div>
+        <div class="number">
+
+        </div>
+      </div>
+      <div id="item-1">&nbsp;
+       <div class="load-bar">
+
+        </div>
+        <div class="number">
+            
+        </div>
+      </div>
+      <div id="item-2">&nbsp;
+
+      </div>
+      <div id="item-3">&nbsp;
+
+      </div>
+      <div id="item-4">&nbsp;
+
+      </div>
+      <div id="item-5">&nbsp;
+
+      </div>
+      <div id="item-6">&nbsp;
+
+      </div>
+      <div id="item-7">&nbsp;
+
+      </div>
+    </div>
