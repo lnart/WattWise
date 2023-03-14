@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.mqttClient = void 0;
 const mqtt_1 = require("mqtt");
 const dotenv_1 = require("dotenv");
 const uuid_1 = require("uuid");
@@ -37,5 +38,5 @@ client.on('message', async (TOPIC, payload) => {
 client.on('error', (error) => {
     console.error(error);
 });
-exports.default = client;
+exports.mqttClient = client;
 //# sourceMappingURL=mqttController.js.map
