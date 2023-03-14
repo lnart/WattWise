@@ -13,7 +13,7 @@ app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.set('views', 'src/views');
 app.set('view engine', 'ejs');
-app.use('/src/public', express_1.default.static('public'));
+app.use('/src/public', express_1.default.static('src/public'));
 app.use('/', indexRoutes_1.default);
 mqttController_1.mqttClient;
 app.listen(process.env.PORT, () => {
