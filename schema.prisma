@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:fighting@localhost:5432/testWattWise"
+}
+
+
+model User {
+  User_ID     Int      @id @default(autoincrement())
+  Surname     String
+  Firstname   String
+  Email       String
+  Zipcode     Int
+  Password    String
+  Created_at  DateTime
+  flatmates   Flatmate[]
+  bills       Bill[]
+  payments    Payment[]
+}
+
+model Flatmate {
+  Flatmate_ID Int      @id @default(autoincrement())
+  Name        String
+  Email       String
+  Created_at  DateTime
+  user        User     @relation(fields: [User_ID], references: [User_ID])
+  User_ID     Int
+  bills       Bill_Flatmate[]
+  payments    Payment[]
+}
+
+model Bill {
+  Bill_ID      Int           @id @default(autoincrement())
+  Total_amount Float
+  Paid         Boolean
+  Created_at   DateTime
+  user         User          @relation(fields: [User_ID], references: [User_ID])
+  User_ID      Int
+  flatmates    Bill_Flatmate[]
+  payments     Payment_Bill[]
+}
+
+model Bill_Flatmate {
+  bill        Bill      @relation(fields: [Bill_ID], references: [Bill_ID])
+  Bill_ID     Int
+  flatmate    Flatmate  @relation(fields: [Flatmate_ID], references: [Flatmate_ID])
+  Flatmate_ID Int
+  @@id([Bill_ID, Flatmate_ID])
+}
+
+model Payment {
+  Payment_ID  Int      @id @default(autoincrement())
+  Amount      Float
+  Completed   Boolean
+  Created_at  DateTime
+  user        User     @relation(fields: [User_ID], references: [User_ID])
+  User_ID     Int
+  flatmate    Flatmate @relation(fields: [Flatmate_ID], references: [Flatmate_ID])
+  Flatmate_ID Int
+  bills       Payment_Bill[]
+}
+
+model Payment_Bill {
+  payment     Payment @relation(fields: [Payment_ID], references: [Payment_ID])
+  Payment_ID  Int
+  bill        Bill    @relation(fields: [Bill_ID], references: [Bill_ID])
+  Bill_ID     Int
+  @@id([Payment_ID, Bill_ID])
+}
