@@ -13,7 +13,7 @@ interface dbUser {
   }
 
 export async function createUser(user: dbUser){
-    const createduser = await prisma.user.create({
+    const createdUser = await prisma.user.create({
         data: {
             Firstname: user.Firstname,
             Surname: user.Surname,
@@ -23,8 +23,16 @@ export async function createUser(user: dbUser){
             Created_at: user.Created_at,
         }
     })
-    console.log(createduser);
-    
+    return createdUser
+}
+
+export async function findUser(email: string){
+    const foundUser = await prisma.user.findFirst({
+        where: {
+            Email: email
+        }
+    })
+    return foundUser
 }
 
 
