@@ -22,9 +22,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkIfUserExist = void 0;
+exports.compareUserCredentials = exports.checkIfUserExist = void 0;
 const db = __importStar(require("../controller/dbController"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
 async function checkIfUserExist(email) {
     if (await db.findUser(email)) {
         return true;
@@ -34,4 +38,16 @@ async function checkIfUserExist(email) {
     }
 }
 exports.checkIfUserExist = checkIfUserExist;
+async function compareUserCredentials(email, password) {
+    const user = await db.findUser(email);
+    const hashedPassword = user === null || user === void 0 ? void 0 : user.Password;
+    //@ts-ignore
+    if (bcrypt_1.default.compare(hashedPassword, password)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+exports.compareUserCredentials = compareUserCredentials;
 //# sourceMappingURL=loginController.js.map
