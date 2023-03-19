@@ -35,5 +35,17 @@ export async function findUser(email: string){
     return foundUser
 }
 
+export async function deleteUser(email: string){
+    try {
+        await prisma.user.delete({
+            where: {
+                Email: email
+            }
+        })
+    } catch (error) {
+        console.error(error)
+    }
+}
+
 
 

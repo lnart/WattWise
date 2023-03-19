@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findUser = exports.createUser = void 0;
+exports.deleteUser = exports.findUser = exports.createUser = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 async function createUser(user) {
@@ -26,4 +26,17 @@ async function findUser(email) {
     return foundUser;
 }
 exports.findUser = findUser;
+async function deleteUser(email) {
+    try {
+        await prisma.user.delete({
+            where: {
+                Email: email
+            }
+        });
+    }
+    catch (error) {
+        console.error(error);
+    }
+}
+exports.deleteUser = deleteUser;
 //# sourceMappingURL=dbController.js.map
