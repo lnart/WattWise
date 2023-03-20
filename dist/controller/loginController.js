@@ -42,12 +42,10 @@ async function compareUserCredentials(email, password) {
     const user = await db.findUser(email);
     const hashedPassword = user === null || user === void 0 ? void 0 : user.Password;
     //@ts-ignore
-    if (bcrypt_1.default.compare(hashedPassword, password)) {
+    const match = await bcrypt_1.default.compare(password, hashedPassword);
+    if (match)
         return true;
-    }
-    else {
-        return false;
-    }
+    return false;
 }
 exports.compareUserCredentials = compareUserCredentials;
 //# sourceMappingURL=loginController.js.map
