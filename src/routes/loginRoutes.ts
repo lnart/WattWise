@@ -4,6 +4,7 @@ import { createUser, findUser } from "../controller/dbController";
 import { Prisma, PrismaClient } from "@prisma/client";
 import * as login from '../controller/loginController'
 import * as db from '../controller/dbController'
+import * as count from '../controller/countController'
 import bcrypt from 'bcrypt'
 
 const prisma = new PrismaClient()
@@ -44,7 +45,10 @@ router.post('/login', async(req, res) => {
         res.render('login', {message : 'Email Doesnt Exist'})
 
     }else if(await login.checkIfUserExist(req.body.email) && await login.compareUserCredentials(req.body.email, req.body.password)){
-        res.render('test')
+        res.render('test', {
+            email: req.body.email,
+            liveCount: await count.readLiveCount(req.body.email)
+        })
     }else{
         res.render('login', {message: 'Wrong Password'})
     }

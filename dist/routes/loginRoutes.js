@@ -30,6 +30,7 @@ const express_1 = require("express");
 const dbController_1 = require("../controller/dbController");
 const client_1 = require("@prisma/client");
 const login = __importStar(require("../controller/loginController"));
+const count = __importStar(require("../controller/countController"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const prisma = new client_1.PrismaClient();
 let router = (0, express_1.Router)();
@@ -65,7 +66,10 @@ router.post('/login', async (req, res) => {
         res.render('login', { message: 'Email Doesnt Exist' });
     }
     else if (await login.checkIfUserExist(req.body.email) && await login.compareUserCredentials(req.body.email, req.body.password)) {
-        res.render('test');
+        res.render('test', {
+            email: req.body.email,
+            liveCount: await count.readLiveCount(req.body.email)
+        });
     }
     else {
         res.render('login', { message: 'Wrong Password' });
