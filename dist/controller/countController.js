@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.readLiveCount = exports.saveLiveCount = void 0;
+exports.createTopic = exports.readLiveCount = exports.saveLiveCount = void 0;
 const client_1 = require("@prisma/client");
 const db = __importStar(require("./dbController"));
 const prisma = new client_1.PrismaClient();
@@ -59,4 +59,15 @@ async function readLiveCount(email) {
     return parseFloat(liveCount === null || liveCount === void 0 ? void 0 : liveCount.count) - parseFloat(yesterdayCount === null || yesterdayCount === void 0 ? void 0 : yesterdayCount.count);
 }
 exports.readLiveCount = readLiveCount;
+async function createTopic(email, type, array) {
+    const user = await db.findUser(email);
+    const userid = user === null || user === void 0 ? void 0 : user.User_ID;
+    const topic = `${type}/${userid}/live`;
+    await prisma.topics.create({
+        data: {
+            name: topic
+        }
+    });
+}
+exports.createTopic = createTopic;
 //# sourceMappingURL=countController.js.map

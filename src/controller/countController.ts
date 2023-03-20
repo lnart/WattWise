@@ -42,3 +42,13 @@ export async function readLiveCount(email: string){
 }
 
 
+export async function createTopic(email: string, type: string, array: any){
+    const user = await db.findUser(email)
+    const userid = user?.User_ID
+    const topic = `${type}/${userid}/live`
+    await prisma.topics.create({
+        data: {
+            name: topic
+        }
+    })
+}
