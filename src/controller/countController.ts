@@ -22,3 +22,23 @@ export async function saveLiveCount(count: any, topic: string){
     })
 }
 
+export async function readLiveCount(email: string){
+    const user = await db.findUser(email)
+    const UID = user?.User_ID
+    
+    let liveCount = await prisma.consumption.findFirst({
+        where: {User_ID: UID},
+        take: -1
+    })
+
+    let yesterdayCount = await prisma.consumption.findFirst({
+        where: {
+            User_ID: UID,
+            Day: parseFloat(liveCount?.Day) -1,
+        }
+    })
+
+    return  parseFloat(liveCount?.count) - parseFloat(yesterdayCount?.count)
+}
+
+
