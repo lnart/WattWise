@@ -2,7 +2,6 @@ import { PrismaClient } from "@prisma/client"
 import * as db from "./dbController"
 import { log } from "console"
 
-
 const prisma = new PrismaClient()
 
 
@@ -22,23 +21,37 @@ export async function saveLiveCount(count: any, topic: string){
     })
 }
 
-export async function readLiveCount(email: string){
+
+export async function calcLiveCount(email: string){ //covered
+    const currentCount = await readLiveCount(email)
+    const yesterdaysCount = await readYesterdayCount(email)
+    return currentCount?.count - yesterdaysCount?.count
+}
+
+
+export async function readLiveCount(email: string){ //covered
     const user = await db.findUser(email)
     const UID = user?.User_ID
-    
-    let liveCount = await prisma.consumption.findFirst({
+    const liveCount = await prisma.consumption.findFirst({
         where: {User_ID: UID},
         take: -1
     })
+    return liveCount
+}
 
-    let yesterdayCount = await prisma.consumption.findFirst({
+
+export async function readYesterdayCount(email: string){ //covered
+    const user = await db.findUser(email)
+    const UID = user?.User_ID
+    let liveCount = await readLiveCount(email)
+    const day = liveCount.Day
+    const yesterdayCount = await prisma.consumption.findFirst({
         where: {
             User_ID: UID,
-            Day: parseFloat(liveCount?.Day) -1,
+            Day: day
         }
     })
-
-    return  parseFloat(liveCount?.count) - parseFloat(yesterdayCount?.count)
+    return yesterdayCount
 }
 
 
