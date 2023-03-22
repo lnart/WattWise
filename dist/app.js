@@ -14,7 +14,7 @@ app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.set('views', 'src/views');
 app.set('view engine', 'ejs');
-app.use('public', express_1.default.static('./public'));
+app.use('/public', express_1.default.static('public'));
 app.use(indexRoutes_1.default);
 app.use(loginRoutes_1.default);
 mqttController_1.mqttClient;

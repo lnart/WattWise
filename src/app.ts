@@ -10,7 +10,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true}))
 app.set('views', 'src/views')
 app.set('view engine', 'ejs')
-app.use('public', express.static('./public'))
+app.use('/public', express.static('public'))
 app.use(indexRoutes)
 app.use(loginRoutes)
 mqttClient

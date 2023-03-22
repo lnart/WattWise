@@ -1,8 +1,8 @@
-import e, { Router } from "express";
-import { Express, request, response } from "express";
-import * as db from '../controller/dbController'
-import * as count from '../controller/countController'
-let router = Router()
+import { Router } from "express";
+import express from "express";
+const router = Router()
+
+router.use('/public', express.static('public'))
 
 router.get('/', (req, res) => {
     res.render('test', {
