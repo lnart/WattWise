@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client"
 import * as db from "./dbController"
-import { log } from "console"
 
 const prisma = new PrismaClient()
 
@@ -25,6 +24,7 @@ export async function saveLiveCount(count: any, topic: string){
 export async function calcLiveCount(email: string){ //covered
     const currentCount = await readLiveCount(email)
     const yesterdaysCount = await readYesterdayCount(email)
+    //@ts-ignore
     return currentCount?.count - yesterdaysCount?.count
 }
 
@@ -44,6 +44,7 @@ export async function readYesterdayCount(email: string){ //covered
     const user = await db.findUser(email)
     const UID = user?.User_ID
     let liveCount = await readLiveCount(email)
+    //@ts-ignore
     const day = liveCount.Day
     const yesterdayCount = await prisma.consumption.findFirst({
         where: {
@@ -65,3 +66,15 @@ export async function createTopic(email: string, type: string, array: any){
         }
     })
 }
+
+export async function getAllCountsFromCurrentMonth(){
+    const date : Date = new Date()
+    const month : number = date.getMonth() + 1
+    const allCounts = await prisma.consumption.findMany({
+        where: {
+            Month: month
+        }
+    })
+    console.log(allCounts);
+    
+} 

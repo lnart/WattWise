@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createTopic = exports.readYesterdayCount = exports.readLiveCount = exports.calcLiveCount = exports.saveLiveCount = void 0;
+exports.getAllCountsFromCurrentMonth = exports.createTopic = exports.readYesterdayCount = exports.readLiveCount = exports.calcLiveCount = exports.saveLiveCount = void 0;
 const client_1 = require("@prisma/client");
 const db = __importStar(require("./dbController"));
 const prisma = new client_1.PrismaClient();
@@ -44,21 +44,10 @@ async function saveLiveCount(count, topic) {
 }
 exports.saveLiveCount = saveLiveCount;
 async function calcLiveCount(email) {
-    const user = await db.findUser(email);
-    const UID = user === null || user === void 0 ? void 0 : user.User_ID;
-    let liveCount = await prisma.consumption.findFirst({
-        where: { User_ID: UID },
-        take: -1
-    });
-    let yesterdayCount = await prisma.consumption.findFirst({
-        where: {
-            User_ID: UID,
-            Day: liveCount === null || liveCount === void 0 ? void 0 : liveCount.Day,
-        }
-    });
-    let countLive = liveCount === null || liveCount === void 0 ? void 0 : liveCount.count;
-    let countYesterday = yesterdayCount === null || yesterdayCount === void 0 ? void 0 : yesterdayCount.count;
-    return liveCount - yesterdayCount;
+    const currentCount = await readLiveCount(email);
+    const yesterdaysCount = await readYesterdayCount(email);
+    //@ts-ignore
+    return (currentCount === null || currentCount === void 0 ? void 0 : currentCount.count) - (yesterdaysCount === null || yesterdaysCount === void 0 ? void 0 : yesterdaysCount.count);
 }
 exports.calcLiveCount = calcLiveCount;
 async function readLiveCount(email) {
@@ -75,6 +64,7 @@ async function readYesterdayCount(email) {
     const user = await db.findUser(email);
     const UID = user === null || user === void 0 ? void 0 : user.User_ID;
     let liveCount = await readLiveCount(email);
+    //@ts-ignore
     const day = liveCount.Day;
     const yesterdayCount = await prisma.consumption.findFirst({
         where: {
@@ -96,4 +86,15 @@ async function createTopic(email, type, array) {
     });
 }
 exports.createTopic = createTopic;
+async function getAllCountsFromCurrentMonth() {
+    const date = new Date();
+    const month = date.getMonth() + 1;
+    const allCounts = await prisma.consumption.findMany({
+        where: {
+            Month: month
+        }
+    });
+    console.log(allCounts);
+}
+exports.getAllCountsFromCurrentMonth = getAllCountsFromCurrentMonth;
 //# sourceMappingURL=countController.js.map
