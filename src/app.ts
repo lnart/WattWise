@@ -3,6 +3,7 @@ import express from "express";
 import { config } from "dotenv";
 import indexRoutes from './routes/indexRoutes'
 import loginRoutes from './routes/loginRoutes'
+import * as myMqttClient from './controller/clientController'
 config()
 
 const app = express()
@@ -15,7 +16,8 @@ app.use(indexRoutes)
 app.use(loginRoutes)
 mqttClient
 
+myMqttClient.generateValue()
+
 app.listen(process.env.PORT, () => {
     console.log(`STARTED SERVER ON PORT ${process.env.PORT}`);
 })
-
