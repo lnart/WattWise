@@ -1,0 +1,11 @@
+services:
+  wattwise:
+    container_name: wattwise
+    image: wattwise
+    restart: always
+    ports: 
+      - 2000:8000
+    volumes:
+      - ./src:/app/src
+      - ./schema.prisma:/app/schema.prisma
+    command: npm run dev 
