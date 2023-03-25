@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllCountsFromCurrentMonth = exports.createTopic = exports.readYesterdayCount = exports.readLiveCount = exports.calcLiveCount = exports.saveLiveCount = void 0;
+exports.calcKwhInEuro = exports.sumArray = exports.getAverageCounts = exports.getAllCountsFromCurrentMonth = exports.createTopic = exports.readYesterdayCount = exports.readLiveCount = exports.calcLiveCount = exports.saveLiveCount = void 0;
 const client_1 = require("@prisma/client");
 const db = __importStar(require("./dbController"));
 const prisma = new client_1.PrismaClient();
@@ -86,15 +86,40 @@ async function createTopic(email, type, array) {
     });
 }
 exports.createTopic = createTopic;
-async function getAllCountsFromCurrentMonth() {
+async function getAllCountsFromCurrentMonth(counter_type) {
     const date = new Date();
     const month = date.getMonth() + 1;
+    const year = date.getFullYear();
     const allCounts = await prisma.consumption.findMany({
         where: {
-            Month: month
+            Month: month,
+            Year: year,
+            counter_type: counter_type
         }
     });
-    console.log(allCounts);
+    return allCounts;
 }
 exports.getAllCountsFromCurrentMonth = getAllCountsFromCurrentMonth;
+async function getAverageCounts(array) {
+    let counts = [];
+    const dividor = array.length;
+    for (let i = 0; i < array.length; i++) {
+        counts.push(array[i].count);
+    }
+    console.log(counts);
+    const sum = await sumArray(counts);
+    console.log(sum);
+    return sum / dividor;
+}
+exports.getAverageCounts = getAverageCounts;
+async function sumArray(array) {
+    return array.reduce((total, current) => {
+        return total + current;
+    }, 0);
+}
+exports.sumArray = sumArray;
+async function calcKwhInEuro(count) {
+    return Math.round(count * 0.3445);
+}
+exports.calcKwhInEuro = calcKwhInEuro;
 //# sourceMappingURL=countController.js.map

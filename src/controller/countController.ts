@@ -67,14 +67,41 @@ export async function createTopic(email: string, type: string, array: any){
     })
 }
 
-export async function getAllCountsFromCurrentMonth(){
+export async function getAllCountsFromCurrentMonth(counter_type: string){
     const date : Date = new Date()
     const month : number = date.getMonth() + 1
+    const year : number = date.getFullYear() 
     const allCounts = await prisma.consumption.findMany({
         where: {
-            Month: month
+            Month: month,
+            Year: year,
+            counter_type: counter_type
         }
-    })
-    console.log(allCounts);
-    
+    })    
+    return allCounts
 } 
+
+
+export async function getAverageCounts(array: any) {
+    let counts:any = []
+    const dividor:number = array.length
+    for(let i = 0; i<array.length; i++){
+        counts.push(array[i].count)
+    }
+    console.log(counts);
+    
+    const sum = await sumArray(counts)
+    console.log(sum);
+    
+    return sum / dividor
+}
+
+export async function sumArray(array: any[]){
+    return array.reduce((total: any, current: any) => {
+        return total + current;
+    }, 0);
+}
+
+export async function calcKwhInEuro(count: number){
+    return Math.round(count*0.3445)
+}
