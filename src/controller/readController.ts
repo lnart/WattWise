@@ -92,3 +92,25 @@ export async function getYaxisMonth(UID:number, type:string){
 }
 
 
+export async function getyAxisYear(UID:number, type:string){
+    const counter = await prisma.counter.findUnique({
+        where: {
+            user_id_type: {
+                user_id:UID,
+                type:type
+            }
+        }
+    })
+    if(counter){
+        const counterId:number = counter.counter_id
+        const currentYear:number = dayjs().get('year')
+        const tableOfTheYear = await prisma.yearlyConsumption.findFirst({
+            where: {
+                counter_id: counterId,
+                consumption_year: currentYear
+            }
+        })
+        return tableOfTheYear?.consumption_year_counts
+    }
+}
+
