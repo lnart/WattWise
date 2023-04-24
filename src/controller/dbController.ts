@@ -4,23 +4,19 @@ const prisma = new PrismaClient()
 
 
 interface dbUser {
-    Firstname: string,
-    Surname: string,
+    username: string,
     Email: string,
     Password: string,
     Zipcode: number,
-    Created_at: Date
   }
 
 export async function createUser(user: dbUser){
     const createdUser = await prisma.user.create({
         data: {
-            Firstname: user.Firstname,
-            Surname: user.Surname,
-            Email: user.Email,
-            Password: user.Password,
-            Zipcode: user.Zipcode,
-            Created_at: user.Created_at,
+            username: user.username,
+            email: user.Email,
+            password: user.Password,
+            zipcode: user.Zipcode,
         }
     })
     return createdUser
@@ -29,23 +25,54 @@ export async function createUser(user: dbUser){
 export async function findUser(email: string){
     const foundUser = await prisma.user.findFirst({
         where: {
-            Email: email
+            email: email
         }
     })
     return foundUser
 }
 
-export async function deleteUser(email: string){
-    try {
-        await prisma.user.delete({
+export async function deleteUser(UID:number) {
+    const user = await prisma.user.findUnique({
+        where: {
+            user_id: UID
+        }
+    })
+    const counter = await prisma.counter.findMany({
+        where: {
+            user_id: UID
+        }
+    })
+    for(let i = 0; i < counter.length; i++){
+        const counterId = counter[i].counter_id
+
+        
+        await prisma.dailyConsumption.deleteMany({
             where: {
-                Email: email
+                counter_id: counterId
             }
         })
-    } catch (error) {
-        console.error(error)
+        await prisma.weeklyConsumption.deleteMany({
+            where: {counter_id: counterId}
+        })
+        
+        await prisma.monthlyConsumption.deleteMany({
+            where: {
+                counter_id: counterId
+            }
+        })
+        await prisma.monthlyConsumption.deleteMany({
+            where: {
+                counter_id: counterId
+            }
+        })
+        await prisma.counter.delete({
+            where: {counter_id: counterId}
+        })
+
+        await prisma.user.delete({
+            where: {user_id: UID}
+        })
     }
 }
-
 
 
