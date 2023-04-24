@@ -1,5 +1,10 @@
 import * as db from '../controller/dbController'
 import bcrypt from 'bcrypt'
+import Jwt from 'jsonwebtoken'
+import { config } from 'dotenv'
+import { userInfo } from 'os'
+import dayjs from 'dayjs'
+config()
 
 export async function checkIfUserExist(email: string){
     if(await db.findUser(email)){
@@ -11,10 +16,22 @@ export async function checkIfUserExist(email: string){
 
 export async function compareUserCredentials(email: string, password: string){
     const user = await db.findUser(email)
-    const hashedPassword = user?.Password
+    const hashedPassword = user?.password    
     //@ts-ignore
-    const match = await bcrypt.compare(password, hashedPassword)
+    const match = bcrypt.compare(password, hashedPassword)
     if(match) return true
     return false
     
 }
+
+export async function logInUser(req:any, res:any){
+    const user = await db.findUser(req.body.email)
+    if(await checkIfUserExist(req.body.email) === false){        
+        return res.redirect('/login')
+    }else if(await checkIfUserExist(req.body.email) && await compareUserCredentials(req.body.email, req.body.password)){        
+        return true
+    }else{        
+        return res.redirect('/login')
+    }
+}
+
