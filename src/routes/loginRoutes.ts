@@ -6,53 +6,79 @@ import * as login from '../controller/loginController'
 import * as db from '../controller/dbController'
 import * as count from '../controller/countController'
 import bcrypt from 'bcrypt'
-
+import Jwt from "jsonwebtoken";
+import { config } from 'dotenv'
+config()
+import * as wt from '../controller/webTokenController'
+import cookieParser, { signedCookie } from "cookie-parser";
 const prisma = new PrismaClient()
 let router = Router()
 
-router.get('/register', (req, res)=>{
-    res.render('register', {
-        message: false
-    })
-})
+router.use(cookieParser());
+
+  
+router.get("/login", (req, res) => {    
+    res.render('login')
+  });
+  
+
+  router.get("/logout", (req, res) => {    
+    return res
+      .clearCookie('email')
+      .clearCookie("access_token")
+      .status(200)
+      .redirect('/login')
+  });
+  
 
 router.post('/register', async (req, res) => {
     if(await findUser(req.body.email) === null){
         let salt = await bcrypt.genSalt()
         let newUser = await createUser({
-            Firstname: req.body.firstname,
-            Surname: req.body.surname,
+            username: req.body.firstname,
             Email: req.body.email,
             Zipcode: parseFloat(req.body.zipcode),
             Password: await bcrypt.hash(req.body.password, salt),
-            Created_at: new Date()
         })
-        res.render('login', {message: ''})
+        res.json({message: 'Successfully created User'})
     }else{
-        res.render('register', {
+        res.json({
             message: 'Email Adress is already in use'
         })
     }
-    
 })
 
-router.get('/login', (req, res) => {
-    res.render('login', {message : false})
+router.get('/register', (req,res) =>{
+    res.render('register', {
+        message: false
+    })
 })
 
 router.post('/login', async(req, res) => {
-    if(await login.checkIfUserExist(req.body.email) === false){
-        res.render('login', {message : 'Email Doesnt Exist'})
-
-    }else if(await login.checkIfUserExist(req.body.email) && await login.compareUserCredentials(req.body.email, req.body.password)){
-        res.render('test', {
-            email: req.body.email,
-            liveCount: await count.readLiveCount(req.body.email)
-        })
-    }else{
-        res.render('login', {message: 'Wrong Password'})
-    }
+    const user = await findUser(req.body.email)
+    // const role = user?.Role
     
+    try{
+        
+        if(await login.logInUser(req, res) && process.env.ACCESS_TOKEN_SECRET){
+            const token = Jwt.sign({email: req.body.email}, process.env.ACCESS_TOKEN_SECRET)
+            res
+                .cookie('access_token', token)
+                .redirect('/')
+        }
+    }catch(error){
+        console.log(error);
+        res.sendStatus(403)
+        
+    }
 })
+
+router.get('/user', wt.authorization, async(req, res) => {
+    console.log(req.cookies);
+    
+    res.json({cookies: req.cookies})
+})
+
+
 
 export default router
