@@ -4,7 +4,6 @@ import { config } from "dotenv";
 import indexRoutes from './routes/indexRoutes'
 import loginRoutes from './routes/loginRoutes'
 import deletionRoutes from './routes/deletionRoutes'
-import * as myMqttClient from './controller/clientController'
 import * as weather from './controller/weatherApiController'
 import * as db from './controller/dbController'
 import * as count from './controller/countController'
@@ -43,7 +42,7 @@ const prisma = new PrismaClient()
 execute.executeEveryNewHour()
 setInterval(execute.executeEveryNewHour, 1000 * 60 * 60) 
 
-count.saveWeeklyCounts()
+execute.executeSaveWeeklyCountsDaily()
 setInterval(execute.executeSaveWeeklyCountsDaily, 1000)
 
 execute.executeSaveMonthlyCountsDaily()

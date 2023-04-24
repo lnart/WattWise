@@ -81,8 +81,8 @@
         <form method="post" action="/accountSettings">
             <h1 data-testid="headline">Account Settings</h1>
             <label for="email">Email:</label>
-            <input data-testid="email" type="text" name="email" id="email" required>
-            <label for="password">Password:</label>
+            <input data-testid="email" type="text" name="email" id="email" value="<%=email%>" required>
+            <label for="password">New Password:</label>
             <input type="checkbox" onclick="showPwd()">Show Password
             <input data-testid="password" type="password" name="password" id="password" required>
             <input data-testid="save-changes-btn" type="submit" value="Save Changes">
@@ -100,6 +100,7 @@
         </form>
     </div>
     <script>
+		const userEmail = JSON.stringify(email)
 function showPwd(){
     let password = document.getElementById('password')
     if(password.type === 'password'){

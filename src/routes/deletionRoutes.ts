@@ -2,11 +2,11 @@ import { Router } from "express";
 import express from "express";
 import * as db from '../controller/dbController'
 import * as count from '../controller/countController'
-import * as mqtt from '../controller/clientController'
 import * as wt from '../controller/webTokenController'
 import dayjs from "dayjs";
 import * as reader from '../controller/readController'
-
+import { Prisma, PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient
 const router = Router()
 
 router.use('/public',wt.authorization, express.static('public'))
@@ -16,7 +16,9 @@ router.get('/account', async(req, res) => {
         const token:string = (req.headers.cookie!.split('=')[1]);
         const email:string = (wt.parseJwt(token)['email'])
         const user = await db.findUser(email)
-        res.render('delete')
+        res.render('delete', {
+            email: email
+        })
     } catch (error) {
         
     }
@@ -36,4 +38,26 @@ router.get('/deleteUser', async(req, res) => {
 
 })
 
-export default router
+
+router.post('/accountSettings', async (req, res) => {
+    const token:string = (req.headers.cookie!.split('=')[1]);
+    const email:string = (wt.parseJwt(token)['email'])
+    console.log(email);
+    
+    const user = await db.findUser(email)
+    console.log(user);
+    
+    const UID: number = user!.user_id
+    const newEmail = req.body.email
+    const newPassword = req.body.password
+    await prisma.user.update({
+        where: {user_id:UID},
+        data: {
+            email: newEmail, 
+            password: newPassword
+        }
+    })
+    res 
+        .redirect('/logout')
+})
+export default router 

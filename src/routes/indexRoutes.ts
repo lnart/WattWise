@@ -2,7 +2,6 @@ import { Router } from "express";
 import express from "express";
 import * as db from '../controller/dbController'
 import * as count from '../controller/countController'
-import * as mqtt from '../controller/clientController'
 import * as wt from '../controller/webTokenController'
 import dayjs from "dayjs";
 import * as reader from '../controller/readController'

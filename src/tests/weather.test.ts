@@ -22,5 +22,5 @@ test('fetch weather data correctly', async() => {
   expect(result).toHaveProperty('days')
   expect(result['days']).toHaveLength(2)
 
-  
 })
+
