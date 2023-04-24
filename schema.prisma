@@ -4,86 +4,147 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:fighting@localhost:5432/testWattWise"
+  url      = "postgresql://postgres:fighting@localhost:5432/performanceWattWise"
 }
 
 model User {
-  User_ID     Int           @id @default(autoincrement())
-  Surname     String
-  Firstname   String
-  Email       String        @unique
-  Zipcode     Int
-  Password    String
-  Created_at  DateTime
-  flatmates   Flatmate[]
-  bills       Bill[]
-  payments    Payment[]
-  Consumption Consumption[]
+  user_id  Int       @id @default(autoincrement())
+  username String
+  password String
+  email    String
+  zipcode  Int
+  counters Counter[]
 }
 
-model Consumption {
-  User         User     @relation(fields: [User_ID], references: [User_ID])
-  User_ID      Int
-  Date         DateTime @unique @default(now())
-  Day          Int
-  Month        Int
-  Year         Int
-  count        Int
-  counter_type String
+model Counter {
+  counter_id          Int                  @id @default(autoincrement())
+  user_id             Int
+  type                String
+  count               Int
+  timestamp           DateTime
+  daily_consumption   DailyConsumption[]
+  weekly_consumption  WeeklyConsumption[]
+  monthly_consumption MonthlyConsumption[]
+  yearly_consumption  YearlyConsumption[]
+  
+  user                User                 @relation(fields: [user_id], references: [user_id])
+
+  @@unique([user_id, type])
 }
 
-model Flatmate {
-  Flatmate_ID Int             @id @default(autoincrement())
-  Name        String
-  Email       String
-  Created_at  DateTime
-  user        User            @relation(fields: [User_ID], references: [User_ID])
-  User_ID     Int
-  bills       Bill_Flatmate[]
-  payments    Payment[]
+model DailyConsumption {
+  consumption_id     Int      @id @default(autoincrement())
+  counter_id         Int
+  consumption_date   DateTime
+  consumption_counts Int[]
+  counter            Counter  @relation(fields: [counter_id], references: [counter_id])
+  @@unique([counter_id, consumption_date])
 }
 
-model Bill {
-  Bill_ID      Int             @id @default(autoincrement())
-  Total_amount Float
-  Paid         Boolean
-  Created_at   DateTime
-  user         User            @relation(fields: [User_ID], references: [User_ID])
-  User_ID      Int
-  flatmates    Bill_Flatmate[]
-  payments     Payment_Bill[]
+model WeeklyConsumption {
+  consumption_id          Int      @id @default(autoincrement())
+  counter_id              Int
+  consumption_week_start  DateTime
+  consumption_week_counts Int[]
+  counter                 Counter  @relation(fields: [counter_id], references: [counter_id])
 }
 
-model Bill_Flatmate {
-  bill        Bill     @relation(fields: [Bill_ID], references: [Bill_ID])
-  Bill_ID     Int
-  flatmate    Flatmate @relation(fields: [Flatmate_ID], references: [Flatmate_ID])
-  Flatmate_ID Int
-
-  @@id([Bill_ID, Flatmate_ID])
+model MonthlyConsumption {
+  consumption_id           Int      @id @default(autoincrement())
+  counter_id               Int
+  consumption_month        DateTime
+  consumption_month_counts Int[]
+  counter                  Counter  @relation(fields: [counter_id], references: [counter_id])
 }
 
-model Payment {
-  Payment_ID  Int            @id @default(autoincrement())
-  Amount      Float
-  Completed   Boolean
-  Created_at  DateTime
-  user        User           @relation(fields: [User_ID], references: [User_ID])
-  User_ID     Int
-  flatmate    Flatmate       @relation(fields: [Flatmate_ID], references: [Flatmate_ID])
-  Flatmate_ID Int
-  bills       Payment_Bill[]
+model YearlyConsumption {
+  consumption_id          Int     @id @default(autoincrement())
+  counter_id              Int
+  consumption_year        Int
+  consumption_year_counts Int[]
+  counter                 Counter @relation(fields: [counter_id], references: [counter_id])
 }
 
-model Payment_Bill {
-  payment    Payment @relation(fields: [Payment_ID], references: [Payment_ID])
-  Payment_ID Int
-  bill       Bill    @relation(fields: [Bill_ID], references: [Bill_ID])
-  Bill_ID    Int
+// model User {
+//   User_ID     Int           @id @default(autoincrement())
+//   Surname     String
+//   Firstname   String
+//   Email       String        @unique
+//   Zipcode     Int
+//   Password    String
+//   Created_at  DateTime
+//   Role        String        @default("user")
+//   bills       Bill[]
+//   Consumption Consumption[]
+//   flatmates   Flatmate[]
+//   payments    Payment[]
+// }
 
-  @@id([Payment_ID, Bill_ID])
-}
+// model Consumption {
+//   User_ID      Int
+//   Date         DateTime @default(now())
+//   count        Int
+//   counter_type String
+//   Day          Int
+//   Month        Int
+//   Year         Int
+//   WeekOfYear   Int
+//   ID           Int      @id @default(autoincrement())
+//   User         User     @relation(fields: [User_ID], references: [User_ID])
+// }
 
-model Topics {
-  name String @unique
-}
+// model Flatmate {
+//   Flatmate_ID Int             @id @default(autoincrement())
+//   Name        String
+//   Email       String
+//   Created_at  DateTime
+//   User_ID     Int
+//   bills       Bill_Flatmate[]
+//   user        User            @relation(fields: [User_ID], references: [User_ID])
+//   payments    Payment[]
+// }
+
+// model Bill {
+//   Bill_ID      Int             @id @default(autoincrement())
+//   Total_amount Float
+//   Paid         Boolean
+//   Created_at   DateTime
+//   User_ID      Int
+//   user         User            @relation(fields: [User_ID], references: [User_ID])
+//   flatmates    Bill_Flatmate[]
+//   payments     Payment_Bill[]
+// }
+
+// model Bill_Flatmate {
+//   Bill_ID     Int
+//   Flatmate_ID Int
+//   bill        Bill     @relation(fields: [Bill_ID], references: [Bill_ID])
+//   flatmate    Flatmate @relation(fields: [Flatmate_ID], references: [Flatmate_ID])
+
+//   @@id([Bill_ID, Flatmate_ID])
+// }
+
+// model Payment {
+//   Payment_ID  Int            @id @default(autoincrement())
+//   Amount      Float
+//   Completed   Boolean
+//   Created_at  DateTime
+//   User_ID     Int
+//   Flatmate_ID Int
+//   flatmate    Flatmate       @relation(fields: [Flatmate_ID], references: [Flatmate_ID])
+//   user        User           @relation(fields: [User_ID], references: [User_ID])
+//   bills       Payment_Bill[]
+// }
+
+// model Payment_Bill {
+//   Payment_ID Int
+//   Bill_ID    Int
+//   bill       Bill    @relation(fields: [Bill_ID], references: [Bill_ID])
+//   payment    Payment @relation(fields: [Payment_ID], references: [Payment_ID])
+
+//   @@id([Payment_ID, Bill_ID])
+// }
+
+// model Topics {
+//   name String @unique
+// }

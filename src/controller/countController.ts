@@ -1,307 +1,178 @@
-import { PrismaClient } from "@prisma/client"
+import { DailyConsumption, PrismaClient } from "@prisma/client"
 import * as db from "./dbController"
-import dayjs from 'dayjs'
+import dayjs, { utc } from 'dayjs'
 import { Request,Response } from "express";
-
+import { countReset, timeStamp } from "node:console";
+import { create } from "node:domain";
+import { getNextDay } from "./customLocale";
+import { start } from "node:repl";
+import * as reader from './readController'
 const prisma = new PrismaClient()
 
 
 export async function saveLiveCount(count: any, topic: string){
-    const UID = topic.split('/')[1]
-    const type = topic.split('/')[0]    
-    await prisma.dailyConsumption.create({
-        data: {
-            consumption_date: new Date(),
-            consumption_counts: count,
-            counter_id: parseFloat(UID)
-        }
-    })
-}
-
-
-export async function calcLiveCount(email: string){ //covered
-    const currentCount = await readLiveCount(email)
-    const yesterdaysCount = await readYesterdayCount(email)
-    //@ts-ignore
-    return currentCount?.count - yesterdaysCount?.count
-}
-
-
-export async function readLiveCount(email: string){ //covered
-    const user = await db.findUser(email)
-    const UID = user?.user_id
-    const liveCount = await prisma.dailyConsumption.findFirst({
-        where: {counter_id: UID},
-        take: -1
-    })
-    return liveCount
-}
-
-
-export async function getAllCountsFromCurrentMonth(counter_type: string, email:string){
-    const user = await db.findUser(email)
-    const UID = user?.User_ID
-    const date : Date = new Date()
-    const month : number = date.getMonth() + 1
-    const year : number = date.getFullYear() 
-    const allCounts = await prisma.consumption.findMany({
-        where: {
-            User_ID:UID,
-            Month: month,
-            Year: year,
-            counter_type: counter_type
-        }
-    })    
-    return allCounts
-}
-
-
-export async function extractCountsOfToday(array: Array<{User_ID: number, Date: Date, count: number, counter_type: string, Day: number, Month: number, Year: number, WeekOfYear: number, ID: number}>) {
-    const todaysCounts: number[] = [];
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;
-    const today = new Date().getDate();
-    for (let i = 0; i < array.length; i++) {
-        if (array[i]['Year'] === currentYear && array[i]['Month'] === currentMonth && array[i]['Day'] === today) {
-            todaysCounts.push(array[i]['count']);
-        }
-    }
-    return todaysCounts;
-}
-
-interface DataItem {
-    User_ID: number;
-    Date: string;
-    count: number;
-    counter_type: string;
-    Day: number;
-    Month: number;
-    Year: number;
-    WeekOfYear: number;
-    ID: number;
-  }
-  
-  interface SortedData {
-    [key: number]: number;
-  }
-  
-  export function parseAndSortData(data: DataItem[]): SortedData {
-
-    const currentDate = new Date();
-  
-    const currentDay = currentDate.getUTCDate();
-    const currentMonth = currentDate.getUTCMonth() + 1;
-    const currentYear = currentDate.getUTCFullYear();
-  
-    const sortedData: SortedData = {};
-  
-    data.forEach(item => {
-      const hour = new Date(item.Date).getUTCHours();
-  
-      if (
-        item.Day === currentDay &&
-        item.Month === currentMonth &&
-        item.Year === currentYear
-      ) {
-        if (!sortedData[hour]) {
-          sortedData[hour] = 0;
-        }
-  
-        sortedData[hour] += item.count;
-      }
-    });
-  
-    return sortedData;
-  }
-
-  
-  
-  
-
-export async function getAverageCounts(array: any) {
-    let counts:any = []
-    const dividor:number = array.length
-    for(let i = 0; i<array.length; i++){
-        counts.push(array[i].count)
-    };
-    const sum = await sumArray(counts)
-    
-    return Math.round(sum / dividor)
-}
-
-export async function sumArray(array: any[]){
-    return array.reduce((total: any, current: any) => {
-        return total + current;
-    }, 0);
-}
-
-export async function calcKwhInEuro(count: number){
-    return Math.round(count*0.3445)
-}
-
-export async function getCountsOfWeek(email:string, counter_type:string){
-    const user = await db.findUser(email)
-    const UID = user?.User_ID
-    const week = dayjs().week()
-    
-    const countsOfWeek = await prisma.consumption.findMany({
-        where:{
-            User_ID: UID,
-            WeekOfYear: week,
-            counter_type:counter_type
-        }
-    })
-    return countsOfWeek
-}
-
-export async function arrayCountsOfWeek(email: string, counter_type:string) {
-    const counts = await getCountsOfWeek(email, counter_type);
-    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-  
-    const countsByDay = counts.reduce((result, count) => {
-      const dayOfWeek = count.Date.getDay();
-      const dayKey = days[dayOfWeek];
-      //@ts-ignore
-      result[dayKey].push(count.count);
-      return result;
-    }, {
-      sunday: [],
-      monday: [],
-      tuesday: [],
-      wednesday: [],
-      thursday: [],
-      friday: [],
-      saturday: []
-    });
-    return countsByDay;
-  }
-
-  export async function sumOfWeeklyData(data: { [x: string]: never[]; }) {
-    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-  const differences = [];
-  
-  for (let i = 0; i < days.length; i++) {
-    const day = days[i];
-    const counts = data[day];
-    let sum = 0;
-    
-    if (counts.length === 0) {
-      differences.push(0);
-    } else {
-      for (let j = 0; j < counts.length - 1; j++) {
-        sum += counts[j + 1] - counts[j];
-      }
-      differences.push(sum);
-    }
-  }
-  const lastSunday = differences.shift()
-  const nextSundaysCount = await getNextSunday('lola@pafel', 'gas')
-  differences.push(nextSundaysCount)
-  return differences;
-
-  }
-
-export async function getNextSunday(email:string, counter_type:string){
-    const user = await db.findUser(email)
-    const UID = user?.User_ID
-    const nextSunday = await prisma.consumption.findFirst({
-        where:{
-            User_ID:UID,
-            counter_type:counter_type,
-            WeekOfYear: dayjs().week()+1
-        },
-        take: 1
-    })
-    if(nextSunday){
-        const nextSundaysFirstCount = await prisma.consumption.findMany({
-            where: {
-                User_ID: UID,
-                counter_type: 'gas',
-                Day: nextSunday.Day
-            },
-            take: 1
+    const UID:string = topic.split('/')[1]
+    const type:string = topic.split('/')[0]
+    const startOfDay:string = dayjs().utc().startOf('day').toISOString()
+    const counter = await prisma.counter.findFirst({where:{user_id: +UID, type:type}})
+    if(!counter){
+        await prisma.counter.create({
+            data: {
+                user_id:parseFloat(UID),
+                timestamp: startOfDay,
+                count: parseFloat(count),
+                type: type
+            }
         })
-        const nextSundaysLastCount = await prisma.consumption.findMany({
-            where: {
-                User_ID: UID,
-                counter_type: 'gas',
-                Day: nextSunday.Day
-            },
-            take: -1
-        })
-        //@ts-ignore
-        return nextSundaysLastCount[0].count - nextSundaysFirstCount[0].count
     }else{
-        return 0
+        const counterId:number = counter.counter_id
+        await prisma.counter.update({
+            where: {
+                counter_id: counterId
+            },
+            data: {
+                count:parseFloat(count),
+                timestamp: startOfDay
+            }
+        })
     }
 }
 
-export function getArrayOfDaysInMonth(){
-    const upperLimit = dayjs().daysInMonth()
-    const days = []
-    for(let i = 1; i<upperLimit+1; i++){
-        days.push(i)
+
+export async function saveDailyCounts(){
+    const allCounters : any[] = await prisma.counter.findMany()
+    for(let i = 0; i < allCounters.length; i++){
+        const startOfDay:string = dayjs().utc().startOf('day').toISOString()
+        const counter_id:number = allCounters[i].counter_id
+        const count:number = allCounters[i].count
+        const dailyCounts = await prisma.dailyConsumption.findFirst({where:{counter_id, consumption_date: startOfDay}})
+        if(!dailyCounts){
+            await prisma.dailyConsumption.create({data:{
+                counter_id: counter_id,
+                consumption_date: startOfDay,
+                consumption_counts: [count]
+            }})
+        }else{
+            const consumptionCounts:number[] = dailyCounts.consumption_counts
+            consumptionCounts.push(count)
+            await prisma.dailyConsumption.update({
+                where: {consumption_id: dailyCounts.consumption_id},
+                data: {consumption_counts: consumptionCounts}
+            })
+
+        }
     }
-    return days
 }
 
-export async function arrayCountsOfMonth(email: string, counter_type:string) {
-    const counts = await getCountsOfMonth(email, counter_type);
-    const days = getArrayOfDaysInMonth();
-  
-    const countsByDay = counts.reduce((result, count) => {
-      const dayOfWeek = count.Date.getDay();
-      const dayKey = days[dayOfWeek];
-      //@ts-ignore
-      result[dayKey].push(count.count);
-      return result;
-    }, {
-      1: [],
-      2: [],
-      3: [],
-      4: [],
-      5: [],
-      6: [],
-      7: [],
-      8: [],
-      9: [],
-      10: [],
-      11: [],
-      12: [],
-      13: [],
-      14: [],
-      15: [],
-      16: [],
-      17: [],
-      18: [],
-      19: [],
-      20: [],
-      21: [],
-      22: [],
-      23: [],
-      24: [],
-      25: [],
-      26: [],
-      27: [],
-      28: [],
-      29: [],
-      30: []
-
-    });
-    return countsByDay;
+interface Consumption {
+    length: number;
+    consumption_id: number;
+    counter_id: number;
+    consumption_date: Date;
+    consumption_counts: number[]
   }
 
-  export async function getCountsOfMonth(email:string, counter_type:string){
-    const user = await db.findUser(email)
-    const UID = user?.User_ID
-    const week = dayjs().week()
-    
-    const countsOfWeek = await prisma.consumption.findMany({
-        where:{
-            User_ID: UID,
-            Month: new Date().getMonth()+1,
-            counter_type:counter_type
+export async function saveWeeklyCounts() {
+    const arrayOfDays = await reader.readWeeklyCounts() 
+    for(let i = 0; i < arrayOfDays.length; i++){
+        const startOfWeek:string = getNextDay(dayjs().startOf('week').utc().toDate()).toISOString()
+        const counter_id:number = arrayOfDays[i].counter_id
+        const lastItem:number = arrayOfDays[i].consumption_counts.length -1
+        const countOfTheDay:number = arrayOfDays[i].consumption_counts[lastItem] - arrayOfDays[i].consumption_counts[0]
+        const weeklyConsumptionTable = await prisma.weeklyConsumption.findFirst({where: {counter_id: counter_id, consumption_week_start: startOfWeek}})
+
+        if(!weeklyConsumptionTable){            
+            await prisma.weeklyConsumption.create({
+                data: {
+                  counter_id: counter_id,
+                  consumption_week_start: startOfWeek,
+                  consumption_week_counts: [countOfTheDay]
+                }
+            })
+        }else{
+            const weeklyCounts:number[] = weeklyConsumptionTable.consumption_week_counts
+            const consumption_id:number = weeklyConsumptionTable.consumption_id
+            weeklyCounts.push(countOfTheDay)
+            await prisma.weeklyConsumption.update({where:{consumption_id:consumption_id}, data: {consumption_week_counts: weeklyCounts}})
         }
-    })
-    return countsOfWeek
+    } 
+    
+} 
+
+export async function saveMonthlyCounts(){
+    const todaysCounts = await prisma.dailyConsumption.findMany({
+        where:{
+            consumption_date: dayjs().utc().startOf('day').toDate()
+        }})
+
+    for(let i = 0; i<todaysCounts.length; i++){        
+        const counterId = todaysCounts[i].counter_id
+        const lastItem = todaysCounts[i].consumption_counts.length -1
+        const startOfCurrentMonth = dayjs().utc().startOf('month').toDate()
+        const todaysConsumption = todaysCounts[i].consumption_counts[lastItem] - todaysCounts[i].consumption_counts[0]
+        const currentMonthsTable = await prisma.monthlyConsumption.findFirst({where: {counter_id: counterId, consumption_month: startOfCurrentMonth}})
+
+        if(currentMonthsTable){
+            const consumptionId = currentMonthsTable.consumption_id
+            const arrayOfMonthlyCounts = currentMonthsTable.consumption_month_counts
+            arrayOfMonthlyCounts.push(todaysConsumption)
+            await prisma.monthlyConsumption.update({
+                where: {consumption_id: consumptionId},
+                data: {consumption_month_counts: arrayOfMonthlyCounts}
+            })
+        }else{
+            await prisma.monthlyConsumption.create({ 
+                data: {
+                    counter_id: counterId,
+                    consumption_month_counts: todaysConsumption,
+                    consumption_month: startOfCurrentMonth
+                }
+            })
+        }
+    }  
+
 }
+
+export async function saveYearlyCounts(){
+    const startOfCurrentMonth:Date = dayjs().utc().startOf('month').toDate()
+    const startOfYear:number = dayjs().get('year')
+    const monthlyConsumption = await prisma.monthlyConsumption.findMany({
+        where: {consumption_month: startOfCurrentMonth}
+    })
+    for(let i = 0; i < monthlyConsumption.length; i++){
+        const counterId:number = monthlyConsumption[i].counter_id
+        const lastItem:number = monthlyConsumption.length - 1
+        const countOfTheMonth: number = monthlyConsumption[i].consumption_month_counts[lastItem] - monthlyConsumption[i].consumption_month_counts[0]
+        const yearlyConsumptionTable = await prisma.yearlyConsumption.findFirst({
+            where: {counter_id: counterId, consumption_year: startOfYear}
+        })
+        if(yearlyConsumptionTable){
+            const yearlyConsumptionTableId:number = yearlyConsumptionTable.consumption_id
+            const yearlyConsumptionTableCounts = yearlyConsumptionTable.consumption_year_counts
+            yearlyConsumptionTableCounts.push(countOfTheMonth)
+            await prisma.yearlyConsumption.update({
+                where: {consumption_id: yearlyConsumptionTableId},
+                data: {consumption_year_counts: yearlyConsumptionTableCounts}
+            })
+        }else{
+            await prisma.yearlyConsumption.create({
+                data: {
+                    counter_id: counterId,
+                    consumption_year: startOfYear,
+                    consumption_year_counts: [countOfTheMonth]
+                }
+            })
+        }
+    }
+
+}
+
+
+export function sumArray(arr:any) {
+    let sum = 0;
+    for (let i = 0; i < arr.length; i++) {
+      sum += arr[i]; 
+    } 
+    return sum; 
+  }
+  
