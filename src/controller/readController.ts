@@ -68,3 +68,27 @@ export async function getYaxisWeek(UID:number, type: string){
     }
 }
 
+export async function getYaxisMonth(UID:number, type:string){
+    const counter = await prisma.counter.findUnique({
+        where: {
+            user_id_type: {
+                user_id: UID,
+                type: type
+            }
+        }
+    })
+    if(counter){
+        const counterId:number = counter.counter_id
+        const currentMonth:Date = dayjs().utc().startOf('month').toDate()
+        const tableOfTheMonth = await prisma.monthlyConsumption.findFirst({
+            where: {
+                counter_id: counterId,
+                consumption_month: currentMonth
+            }
+        })
+        return tableOfTheMonth?.consumption_month_counts
+        
+    }
+}
+
+
