@@ -114,3 +114,16 @@ export async function getyAxisYear(UID:number, type:string){
     }
 }
 
+export async function readConsumptionCounts(UID:number, type:string){
+    const yAxisDay = await getYAxisDay(UID, type)
+    const yAxisWeek = await getYaxisWeek(UID, type)
+    const yAxisMonth = await getYaxisMonth(UID, type)
+    const yAxisYear = await getyAxisYear(UID, type)
+    const consumptionCounts = {
+        yAxisDay:yAxisDay,
+        yAxisWeek:yAxisWeek,
+        yAxisMonth:yAxisMonth,
+        yAxisYear:yAxisYear
+    }
+    return consumptionCounts
+}
