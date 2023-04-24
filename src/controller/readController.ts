@@ -18,3 +18,30 @@ export async function readWeeklyCounts(){
     return dailyCountsOfCurrentWeek
 }
 
+export async function getYAxisDay(UID:number, type:string) {
+    const today = dayjs().utc().startOf('day').toDate()
+    const counter = await prisma.counter.findUnique({
+        where: {
+            user_id_type: {
+                user_id: UID, 
+                type: type
+            }
+        }
+    })
+    if(counter){
+        const counterId:number = counter?.counter_id
+        const tableOfToday = await prisma.dailyConsumption.findUnique({
+            where: {
+                counter_id_consumption_date: {
+                    counter_id: counterId,
+                    consumption_date: today 
+
+                }
+            }
+        })
+        const todaysCounts = tableOfToday?.consumption_counts
+        return todaysCounts
+    }
+}
+
+
