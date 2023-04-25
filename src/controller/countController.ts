@@ -1,19 +1,13 @@
 import { DailyConsumption, PrismaClient } from "@prisma/client"
-import * as db from "./dbController"
 import dayjs, { utc } from 'dayjs'
-import { Request,Response } from "express";
-import { countReset, timeStamp } from "node:console";
-import { create } from "node:domain";
 import { getNextDay } from "./customLocale";
-import { start } from "node:repl";
 import * as reader from './readController'
+import * as extract from '../helpers/extractHelpers'
+import * as date from '../helpers/dateTimeHelpers'
 const prisma = new PrismaClient()
 
 
-export async function saveLiveCount(count: any, topic: string){
-    const UID:string = topic.split('/')[1]
-    const type:string = topic.split('/')[0]
-    const startOfDay:string = dayjs().utc().startOf('day').toISOString()
+export async function saveLiveCount(UID:string, type:string, startOfDay:string, count:string){
     const counter = await prisma.counter.findFirst({where:{user_id: +UID, type:type}})
     if(!counter){
         await prisma.counter.create({
@@ -24,6 +18,7 @@ export async function saveLiveCount(count: any, topic: string){
                 type: type
             }
         })
+        return 'new counter created'
     }else{
         const counterId:number = counter.counter_id
         await prisma.counter.update({
@@ -35,6 +30,7 @@ export async function saveLiveCount(count: any, topic: string){
                 timestamp: startOfDay
             }
         })
+        return `counter ${counterId} was updated`
     }
 }
 
