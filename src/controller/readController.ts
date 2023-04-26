@@ -6,9 +6,12 @@ import { getNextDay } from "./customLocale"
 const prisma = new PrismaClient()
 
 
-export async function readWeeklyCounts(){
-    const currentWeek = dayjs().utc().isoWeek()
+export async function readAllDailyConsumptionTables() {
     const allDailyCounts = await prisma.dailyConsumption.findMany()
+    return allDailyCounts
+}
+
+export async function readAllCountsOfToday(allDailyCounts:any[]){
     const dailyCountsOfCurrentWeek = []
     for(let i = 0; i < allDailyCounts.length; i++){    
         if(allDailyCounts[i].consumption_date.toISOString() === dayjs().utc().startOf('day').toISOString()){
@@ -20,6 +23,7 @@ export async function readWeeklyCounts(){
 
 export async function getYAxisDay(UID:number, type:string) {
     const today = dayjs().utc().startOf('day').toDate()
+    
     const counter = await prisma.counter.findUnique({
         where: {
             user_id_type: {
