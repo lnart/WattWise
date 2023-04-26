@@ -1,6 +1,6 @@
 import { DailyConsumption, PrismaClient } from "@prisma/client"
 import dayjs, { utc } from 'dayjs'
-import { getNextDay } from "./customLocale";
+import { getStartOfWeek } from "./customLocale";
 import * as reader from './readController'
 import * as extract from '../helpers/extractHelpers'
 import * as date from '../helpers/dateTimeHelpers'
@@ -38,13 +38,14 @@ export async function saveLiveCount(UID:string, type:string, startOfDay:string, 
 export async function saveDailyCounts(){
     const allCounters : any[] = await prisma.counter.findMany()
     for(let i = 0; i < allCounters.length; i++){
-        const startOfDay:string = dayjs().utc().startOf('day').toISOString()
-        const counter_id:number = allCounters[i].counter_id
+        const startOfDay:string = date.getStartOfDayAsString()
+        const counterId:number = allCounters[i].counter_id
         const count:number = allCounters[i].count
-        const dailyCounts = await prisma.dailyConsumption.findFirst({where:{counter_id, consumption_date: startOfDay}})
+        const dailyCounts = await prisma.dailyConsumption.findFirst({where:{counter_id: counterId, consumption_date: startOfDay}})
+
         if(!dailyCounts){
             await prisma.dailyConsumption.create({data:{
-                counter_id: counter_id,
+                counter_id: counterId,
                 consumption_date: startOfDay,
                 consumption_counts: [count]
             }})
@@ -68,39 +69,36 @@ interface Consumption {
     consumption_counts: number[]
   }
 
-export async function saveWeeklyCounts() {
-    const arrayOfDays = await reader.readWeeklyCounts() 
-    for(let i = 0; i < arrayOfDays.length; i++){
-        const startOfWeek:string = getNextDay(dayjs().startOf('week').utc().toDate()).toISOString()
-        const counter_id:number = arrayOfDays[i].counter_id
-        const lastItem:number = arrayOfDays[i].consumption_counts.length -1
-        const countOfTheDay:number = arrayOfDays[i].consumption_counts[lastItem] - arrayOfDays[i].consumption_counts[0]
-        const weeklyConsumptionTable = await prisma.weeklyConsumption.findFirst({where: {counter_id: counter_id, consumption_week_start: startOfWeek}})
+export async function saveWeeklyCounts(allCountsOfToday:any[]) {
+    for(let i = 0; i < allCountsOfToday.length; i++){
+        const startOfWeek:string = getStartOfWeek()
+        const counterId:number = allCountsOfToday[i].counter_id
+        const lastItem:number = allCountsOfToday[i].consumption_counts.length -1
+        const countOfTheDay:number = allCountsOfToday[i].consumption_counts[lastItem] - allCountsOfToday[i].consumption_counts[0]
+        const weeklyConsumptionTable = await prisma.weeklyConsumption.findFirst({where: {counter_id: counterId, consumption_week_start: startOfWeek}})
 
         if(!weeklyConsumptionTable){            
             await prisma.weeklyConsumption.create({
                 data: {
-                  counter_id: counter_id,
+                  counter_id: counterId,
                   consumption_week_start: startOfWeek,
                   consumption_week_counts: [countOfTheDay]
                 }
             })
+            return 'Created Weekly Consumption Table'
         }else{
             const weeklyCounts:number[] = weeklyConsumptionTable.consumption_week_counts
             const consumption_id:number = weeklyConsumptionTable.consumption_id
             weeklyCounts.push(countOfTheDay)
             await prisma.weeklyConsumption.update({where:{consumption_id:consumption_id}, data: {consumption_week_counts: weeklyCounts}})
+            return 'Updated Weekly Consumption Table'
         }
+
     } 
     
 } 
 
-export async function saveMonthlyCounts(){
-    const todaysCounts = await prisma.dailyConsumption.findMany({
-        where:{
-            consumption_date: dayjs().utc().startOf('day').toDate()
-        }})
-
+export async function saveMonthlyCounts(todaysCounts:any[]){
     for(let i = 0; i<todaysCounts.length; i++){        
         const counterId = todaysCounts[i].counter_id
         const lastItem = todaysCounts[i].consumption_counts.length -1
