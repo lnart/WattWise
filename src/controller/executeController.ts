@@ -1,5 +1,7 @@
 import * as count from '../controller/countController'
 import * as read from '../controller/readController'
+import * as date from '../helpers/dateTimeHelpers'
+import { PrismaClient } from '@prisma/client'
 import dayjs from 'dayjs'
 
 // export async function executeSaveDailyCountsHourly(){
@@ -7,6 +9,8 @@ import dayjs from 'dayjs'
 //     count.saveDailyCounts()
 //     setTimeout(executeSaveDailyCountsHourly, interval)
 // }
+
+const prisma = new PrismaClient
 
 export function executeEveryNewHour(){
     const now = dayjs().utc()
@@ -18,14 +22,24 @@ export function executeEveryNewHour(){
 export async function executeSaveWeeklyCountsDaily(){
     const now  = dayjs().utc()    
     if(now.isSame(now.endOf('day'))){
-        const dongs = await read.readWeeklyCounts()
-        count.saveWeeklyCounts()
+        const tablesOfToday = await read.readAllDailyConsumptionTables()
+        const allCountsOfToday = await read.readAllCountsOfToday(tablesOfToday)
+        count.saveWeeklyCounts(allCountsOfToday)
     }
 }
 
-export function executeSaveMonthlyCountsDaily(){
+export async function executeSaveMonthlyCountsDaily(){
     const now  = dayjs().utc()    
     if(now.isSame(now.endOf('day'))){
-        count.saveMonthlyCounts()
+        const todaysCounts = await getTodaysTables()
+        count.saveMonthlyCounts(todaysCounts)
     }
+}
+
+export async function getTodaysTables(){
+    const todaysCounts = await prisma.dailyConsumption.findMany({
+        where:{
+            consumption_date: date.getStartOfDayAsString()
+        }})
+        return todaysCounts
 }

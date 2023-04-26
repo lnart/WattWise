@@ -19,6 +19,10 @@ export function getNextDay(date:Date){
   return nextDay
 }
 
+export function getStartOfWeek(){
+  return getNextDay(dayjs().startOf('week').utc().toDate()).toISOString()
+}
+
 //@ts-ignore
 export default dayjs;
 

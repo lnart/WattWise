@@ -75,4 +75,12 @@ export async function deleteUser(UID:number) {
     }
 }
 
+export async function deleteTestUser(email:string){
+    await prisma.user.deleteMany({
+        where: {
+            email: email
+        }
+    })
+}
+
 

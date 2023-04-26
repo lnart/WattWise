@@ -40,11 +40,9 @@ router.post('/register', async (req, res) => {
             Zipcode: parseFloat(req.body.zipcode),
             Password: await bcrypt.hash(req.body.password, salt),
         })
-        res.json({message: 'Successfully created User'})
+        res.redirect('/login')
     }else{
-        res.json({
-            message: 'Email Adress is already in use'
-        })
+        res.redirect('/login')
     }
 })
 

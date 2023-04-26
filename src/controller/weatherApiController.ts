@@ -26,7 +26,7 @@ export async function formatWeatherData(start: String, end: String){
     }
     console.log(formattedTemps);
     
-    return formattedTemps
+    return formattedTemps 
 }
 
 module.exports = {
