@@ -1,7 +1,9 @@
 services:
   wattwise:
     container_name: wattwise
-    image: wattwise
+    build: 
+      context: .
+      target: dev
     restart: always
     ports: 
       - 2000:8000

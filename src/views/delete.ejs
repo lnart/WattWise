@@ -87,11 +87,11 @@
             <input data-testid="password" type="password" name="password" id="password" required>
             <input data-testid="save-changes-btn" type="submit" value="Save Changes">
         </form>
-        <button class="delete-btn" id="delete-btn" onclick="showConfirmation()">Delete User</button>
+        <button class="delete-btn" id="delete-btn" data-testid="deleteButton" onclick="showConfirmation()">Delete User</button>
         <div id="confirmation-dialog" style="display: none">
             <p>Are you sure you want to delete?<br> This decision is Immutable!</p>
             <form mehtod="post" action="/deleteUser" class="delete-user-form">
-                <button class="confirm-btn" style="background-color: red;">Yes</button>
+                <button data-testid="confirmButton" class="confirm-btn" style="background-color: red;">Yes</button>
             </form>
           <button class="confirm-btn" onclick="hideConfirmation()">No</button>
         </div>
