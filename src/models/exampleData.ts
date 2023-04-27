@@ -10,7 +10,7 @@ async function createFakeData() {
             email: 'max@mustermann',
             password: 'p',
             username: 'max',
-            zipcode: 10963
+            zipcode: 42929
         }
     })
 
