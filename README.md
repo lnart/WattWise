@@ -6,6 +6,18 @@ WattWise is an application that receives data from a sensor, saves it to a datab
 
 <img src="public/icons/architecture.png" alt="architecture">
 
+# Database
+
+## Physical Data Model
+
+<img src='public/icons/physicalDataModel.png' alt='physical data model'>
+
+## Logical Data Model
+
+<img src='public/icons/logicalDataModel.png' alt='logical data model'>
+
+
+
 # Installation
 
 1. Clone the repository to your local machine.
