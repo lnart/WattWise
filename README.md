@@ -2,6 +2,10 @@
 
 WattWise is an application that receives data from a sensor, saves it to a database and displays it in graphs on the dashboard. The application can be used to monitor gas, water and electricity consumption and to help users react to that and save cost.
 
+# Architecture
+
+<img src='public/icons/architecture.png', alt='architecture'></img>
+
 # Installation
 
 1. Clone the repository to your local machine.
