@@ -4,7 +4,7 @@ WattWise is an application that receives data from a sensor, saves it to a datab
 
 # Architecture
 
-<img src='public/icons/architecture.png', alt='architecture'></img>
+<img src="public/icons/architecture.png" alt="architecture">
 
 # Installation
 
