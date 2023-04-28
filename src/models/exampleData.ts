@@ -7,9 +7,9 @@ const prisma = new PrismaClient
 async function createFakeData() {
     const user = await prisma.user.create({
         data: {
-            email: 'max@mustermann',
+            email: 'lola@mustermann',
             password: 'p',
-            username: 'max',
+            username: 'lola',
             zipcode: 42929
         }
     })
