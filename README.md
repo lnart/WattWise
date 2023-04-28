@@ -12,7 +12,7 @@ WattWise is an application that receives data from a sensor, saves it to a datab
 
 <img src='public/icons/physicalDataModel.png' alt='physical data model'>
 
-## Logical Data Model
+##  Logical Data Model
 
 <img src='public/icons/logicalDataModel.png' alt='logical data model'>
 
