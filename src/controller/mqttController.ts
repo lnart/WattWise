@@ -9,7 +9,7 @@ const prisma = new PrismaClient
 
 config()
 const clientId = uuid()
-const TOPICS = ['test/hack', 'electricity/2/live', 'gas/2/live', 'water/2/live']
+const TOPICS = ['test/hack', 'electricity/2/live', 'gas/2/live', 'water/2/live', 'gas/4/live']
 console.log('connecting to MQTT Broker');
 
 const client = connect('mqtts://edd3ce52ef5747ab963e27f2669a069c.s2.eu.hivemq.cloud:8883', {
