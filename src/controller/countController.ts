@@ -169,41 +169,48 @@ export async function saveMonthlyCounts(todaysCounts: allCountsOfToday) {
 }
 
 export async function saveYearlyCounts() {
-  const startOfCurrentMonth: Date = dayjs().utc().startOf("month").toDate();
-  const startOfYear: number = dayjs().get("year");
-  const monthlyConsumption = await prisma.monthlyConsumption.findMany({
-    where: { consumption_month: startOfCurrentMonth },
-  });
-  for (let i = 0; i < monthlyConsumption.length; i++) {
-    const counterId: number = monthlyConsumption[i].counter_id;
-    const lastItem: number = monthlyConsumption.length - 1;
-    const countOfTheMonth: number =
-      monthlyConsumption[i].consumption_month_counts[lastItem] -
-      monthlyConsumption[i].consumption_month_counts[0];
-    const yearlyConsumptionTable = await prisma.yearlyConsumption.findFirst({
-      where: { counter_id: counterId, consumption_year: startOfYear },
+  try {
+    const startOfCurrentMonth: Date = dayjs().utc().startOf("month").toDate();
+    const startOfYear: number = dayjs().get("year");
+    const monthlyConsumption = await prisma.monthlyConsumption.findMany({
+      where: { consumption_month: startOfCurrentMonth },
     });
-    if (yearlyConsumptionTable) {
-      const yearlyConsumptionTableId: number =
-        yearlyConsumptionTable.consumption_id;
-      const yearlyConsumptionTableCounts =
-        yearlyConsumptionTable.consumption_year_counts;
-      yearlyConsumptionTableCounts.push(countOfTheMonth);
-      await prisma.yearlyConsumption.update({
-        where: { consumption_id: yearlyConsumptionTableId },
-        data: { consumption_year_counts: yearlyConsumptionTableCounts },
+    for (let i = 0; i < monthlyConsumption.length; i++) {
+      const counterId: number = monthlyConsumption[i].counter_id;
+      const lastItem: number = monthlyConsumption.length - 1;
+      const countOfTheMonth: number =
+        monthlyConsumption[i].consumption_month_counts[lastItem] -
+        monthlyConsumption[i].consumption_month_counts[0];
+      const yearlyConsumptionTable = await prisma.yearlyConsumption.findFirst({
+        where: { counter_id: counterId, consumption_year: startOfYear },
       });
-      return "yearly consumption table updated";
-    } else {
-      await prisma.yearlyConsumption.create({
-        data: {
-          counter_id: counterId,
-          consumption_year: startOfYear,
-          consumption_year_counts: [countOfTheMonth],
-        },
-      });
-      return "yearly consumption table created";
+      if (yearlyConsumptionTable) {
+        const yearlyConsumptionTableId: number =
+          yearlyConsumptionTable.consumption_id;
+  
+        const yearlyConsumptionTableCounts =
+          yearlyConsumptionTable.consumption_year_counts;
+  
+        yearlyConsumptionTableCounts.push(countOfTheMonth);
+        await prisma.yearlyConsumption.update({
+          where: { consumption_id: yearlyConsumptionTableId },
+          data: { consumption_year_counts: yearlyConsumptionTableCounts },
+        });
+        return "yearly consumption table updated";
+      } else {
+        await prisma.yearlyConsumption.create({
+          data: {
+            counter_id: counterId,
+            consumption_year: startOfYear,
+            consumption_year_counts: [countOfTheMonth],
+          },
+        });
+        return "yearly consumption table created";
+      }
     }
+  } catch (error) {
+    console.error(error)
+    throw new Error('no yearly consumption table created')
   }
 }
 
