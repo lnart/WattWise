@@ -12,6 +12,22 @@ type allCounters = {
   timestamp: Date;
 }[];
 
+interface Consumption {
+  length: number;
+  consumption_id: number;
+  counter_id: number;
+  consumption_date: Date;
+  consumption_counts: number[];
+}
+
+type allCountsOfToday = {
+  consumption_id: number;
+  counter_id: number;
+  consumption_date: Date;
+  consumption_counts: number[];
+}[];
+
+
 export async function saveLiveCount(
   UID: string,
   type: string,
@@ -77,15 +93,9 @@ export async function saveDailyCounts() {
   return 'daily consumption table was updated or created'
 }
 
-interface Consumption {
-  length: number;
-  consumption_id: number;
-  counter_id: number;
-  consumption_date: Date;
-  consumption_counts: number[];
-}
 
-export async function saveWeeklyCounts(allCountsOfToday: any[]) {
+
+export async function saveWeeklyCounts(allCountsOfToday: allCountsOfToday) {
   for (let i = 0; i < allCountsOfToday.length; i++) {
     const startOfWeek: string = getStartOfWeek();
     const counterId: number = allCountsOfToday[i].counter_id;
@@ -105,7 +115,6 @@ export async function saveWeeklyCounts(allCountsOfToday: any[]) {
           consumption_week_counts: [countOfTheDay],
         },
       });
-      return "Created Weekly Consumption Table";
     } else {
       const weeklyCounts: number[] =
         weeklyConsumptionTable.consumption_week_counts;
@@ -115,9 +124,9 @@ export async function saveWeeklyCounts(allCountsOfToday: any[]) {
         where: { consumption_id: consumption_id },
         data: { consumption_week_counts: weeklyCounts },
       });
-      return "Updated Weekly Consumption Table";
     }
   }
+  return 'weekly counts table updated or created'
 }
 
 export async function saveMonthlyCounts(todaysCounts: any[]) {
