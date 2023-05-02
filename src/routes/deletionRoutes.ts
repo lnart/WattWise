@@ -1,11 +1,8 @@
 import { Router } from "express";
 import express from "express";
 import * as db from '../controller/dbController'
-import * as count from '../controller/countController'
 import * as wt from '../controller/webTokenController'
-import dayjs from "dayjs";
-import * as reader from '../controller/readController'
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient
 const router = Router()
 
@@ -20,7 +17,7 @@ router.get('/account', async(req, res) => {
             email: email
         })
     } catch (error) {
-        
+        console.error(error)
     }
 })
 
