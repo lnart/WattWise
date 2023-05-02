@@ -49,6 +49,7 @@ export async function saveDailyCounts(){
                 consumption_date: startOfDay,
                 consumption_counts: [count]
             }})
+            return 'daily count table created'
         }else{
             const consumptionCounts:number[] = dailyCounts.consumption_counts
             consumptionCounts.push(count)
@@ -56,7 +57,7 @@ export async function saveDailyCounts(){
                 where: {consumption_id: dailyCounts.consumption_id},
                 data: {consumption_counts: consumptionCounts}
             })
-
+            return 'daily count table updated'
         }
     }
 }
@@ -114,6 +115,7 @@ export async function saveMonthlyCounts(todaysCounts:any[]){
                 where: {consumption_id: consumptionId},
                 data: {consumption_month_counts: arrayOfMonthlyCounts}
             })
+            return 'monthly consumption table updated'
         }else{
             await prisma.monthlyConsumption.create({ 
                 data: {
@@ -122,6 +124,7 @@ export async function saveMonthlyCounts(todaysCounts:any[]){
                     consumption_month: startOfCurrentMonth
                 }
             })
+            return 'monthly consumption table created'
         }
     }  
 
@@ -148,6 +151,7 @@ export async function saveYearlyCounts(){
                 where: {consumption_id: yearlyConsumptionTableId},
                 data: {consumption_year_counts: yearlyConsumptionTableCounts}
             })
+            return 'yearly consumption table updated'
         }else{
             await prisma.yearlyConsumption.create({
                 data: {
@@ -156,6 +160,7 @@ export async function saveYearlyCounts(){
                     consumption_year_counts: [countOfTheMonth]
                 }
             })
+            return 'yearly consumption table created'
         }
     }
 
