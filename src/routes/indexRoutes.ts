@@ -9,8 +9,6 @@ const router = Router()
 router.use('/public', express.static('public'))
 
 router.get('/',wt.authorization, async(req, res) => {
-    console.log(req.headers);
-    
     try {
         const token:string = (req.headers.cookie!.split('=')[1]);
         const email:string = (wt.parseJwt(token)['email'])
@@ -26,8 +24,6 @@ router.get('/',wt.authorization, async(req, res) => {
             weekYGas: gasCounts.yAxisWeek,
             monthYGas: gasCounts.yAxisMonth,
             yearYGas: gasCounts.yAxisYear,
-            yearY: [1, 2, 3, 4, 5, 6, ,7 ,8, 9, 1, 2, 3],
-            yAxisWeek: 12
         })
         
     } catch (error) {
