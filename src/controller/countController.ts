@@ -34,99 +34,115 @@ export async function saveLiveCount(
   startOfDay: string,
   count: string
 ) {
-  const counter = await prisma.counter.findFirst({
-    where: { user_id: +UID, type: type },
-  });
-  if (!counter) {
-    await prisma.counter.create({
-      data: {
-        user_id: parseFloat(UID),
-        timestamp: startOfDay,
-        count: parseFloat(count),
-        type: type,
-      },
+  try {
+    const counter = await prisma.counter.findFirst({
+      where: { user_id: +UID, type: type },
     });
-    return "new counter created";
-  } else {
-    const counterId: number = counter.counter_id;
-    await prisma.counter.update({
-      where: {
-        counter_id: counterId,
-      },
-      data: {
-        count: parseFloat(count),
-        timestamp: startOfDay,
-      },
-    });
-    return `counter ${counterId} was updated`;
+    if (!counter) {
+      await prisma.counter.create({
+        data: {
+          user_id: parseFloat(UID),
+          timestamp: startOfDay,
+          count: parseFloat(count),
+          type: type,
+        },
+      });
+      return "new counter created";
+    } else {
+      const counterId: number = counter.counter_id;
+      await prisma.counter.update({
+        where: {
+          counter_id: counterId,
+        },
+        data: {
+          count: parseFloat(count),
+          timestamp: startOfDay,
+        },
+      });
+      return `counter ${counterId} was updated`;
+    }
+  } catch (error) {
+    console.error(error)
+    throw new Error('didnt save live count')
   }
 }
 
 export async function saveDailyCounts() {
-  const allCounters: allCounters = await prisma.counter.findMany();  
-  for (let i = 0; i < allCounters.length; i++) {
-    const startOfDay: string = date.getStartOfDayAsString();
-    const counterId: number = allCounters[i].counter_id;
-    const count: number = allCounters[i].count;
-    const dailyCounts = await prisma.dailyConsumption.findFirst({
-      where: { counter_id: counterId, consumption_date: startOfDay },
-    });
-
-    if (!dailyCounts) {
-      await prisma.dailyConsumption.create({
-        data: {
-          counter_id: counterId,
-          consumption_date: startOfDay,
-          consumption_counts: [count],
-        },
+  try {
+    const allCounters: allCounters = await prisma.counter.findMany();  
+    for (let i = 0; i < allCounters.length; i++) {
+      const startOfDay: string = date.getStartOfDayAsString();
+      const counterId: number = allCounters[i].counter_id;
+      const count: number = allCounters[i].count;
+      const dailyCounts = await prisma.dailyConsumption.findFirst({
+        where: { counter_id: counterId, consumption_date: startOfDay },
       });
-    } else {
-      const consumptionCounts: number[] = dailyCounts.consumption_counts;
-      consumptionCounts.push(count);
-      await prisma.dailyConsumption.update({
-        where: { consumption_id: dailyCounts.consumption_id },
-        data: { consumption_counts: consumptionCounts },
-      });
-
+  
+      if (!dailyCounts) {
+        await prisma.dailyConsumption.create({
+          data: {
+            counter_id: counterId,
+            consumption_date: startOfDay,
+            consumption_counts: [count],
+          },
+        });
+      } else {
+        const consumptionCounts: number[] = dailyCounts.consumption_counts;
+        consumptionCounts.push(count);
+        await prisma.dailyConsumption.update({
+          where: { consumption_id: dailyCounts.consumption_id },
+          data: { consumption_counts: consumptionCounts },
+        });
+  
+      }
     }
+    return 'daily consumption table was updated or created'
+  } catch (error) {
+    console.error(error)
+    throw new Error('daily consumption table was not created')
   }
-  return 'daily consumption table was updated or created'
 }
 
 
 
 export async function saveWeeklyCounts(allCountsOfToday: allCountsOfToday) {
-  for (let i = 0; i < allCountsOfToday.length; i++) {
-    const startOfWeek: string = getStartOfWeek();
-    const counterId: number = allCountsOfToday[i].counter_id;
-    const lastItem: number = allCountsOfToday[i].consumption_counts.length - 1;
-    const countOfTheDay: number =
-      allCountsOfToday[i].consumption_counts[lastItem] -
-      allCountsOfToday[i].consumption_counts[0];
-    const weeklyConsumptionTable = await prisma.weeklyConsumption.findFirst({
-      where: { counter_id: counterId, consumption_week_start: startOfWeek },
-    });
-
-    if (!weeklyConsumptionTable) {
-      await prisma.weeklyConsumption.create({
-        data: {
-          counter_id: counterId,
-          consumption_week_start: startOfWeek,
-          consumption_week_counts: [countOfTheDay],
-        },
+  try {
+    for (let i = 0; i < allCountsOfToday.length; i++) {
+      const startOfWeek: string = getStartOfWeek();
+      const counterId: number = allCountsOfToday[i].counter_id;
+      const lastItem: number = allCountsOfToday[i].consumption_counts.length - 1;
+      const countOfTheDay: number =
+        allCountsOfToday[i].consumption_counts[lastItem] -
+        allCountsOfToday[i].consumption_counts[0];
+      const weeklyConsumptionTable = await prisma.weeklyConsumption.findFirst({
+        where: { counter_id: counterId, consumption_week_start: startOfWeek },
       });
-    } else {
-      const weeklyCounts: number[] =
-        weeklyConsumptionTable.consumption_week_counts;
-      const consumption_id: number = weeklyConsumptionTable.consumption_id;
-      weeklyCounts.push(countOfTheDay);
-      await prisma.weeklyConsumption.update({
-        where: { consumption_id: consumption_id },
-        data: { consumption_week_counts: weeklyCounts },
-      });
+  
+      if (!weeklyConsumptionTable) {
+        await prisma.weeklyConsumption.create({
+          data: {
+            counter_id: counterId,
+            consumption_week_start: startOfWeek,
+            consumption_week_counts: [countOfTheDay],
+          },
+        });
+      } else {
+        const weeklyCounts: number[] =
+          weeklyConsumptionTable.consumption_week_counts;
+        const consumption_id: number = weeklyConsumptionTable.consumption_id;
+        weeklyCounts.push(countOfTheDay);
+        await prisma.weeklyConsumption.update({
+          where: { consumption_id: consumption_id },
+          data: { consumption_week_counts: weeklyCounts },
+        });
+      }
     }
+    return 'weekly counts table updated or created'
+
+  } catch (error) {
+    console.error(error)
+    throw new Error('weekly consumption table wasnt created')
   }
-  return 'weekly counts table updated or created'
 }
 
 export async function saveMonthlyCounts(todaysCounts: allCountsOfToday) {
