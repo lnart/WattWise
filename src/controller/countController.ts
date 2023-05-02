@@ -56,7 +56,6 @@ export async function saveDailyCounts() {
           consumption_counts: [count],
         },
       });
-      return "daily count table created";
     } else {
       const consumptionCounts: number[] = dailyCounts.consumption_counts;
       consumptionCounts.push(count);
@@ -64,9 +63,10 @@ export async function saveDailyCounts() {
         where: { consumption_id: dailyCounts.consumption_id },
         data: { consumption_counts: consumptionCounts },
       });
-      return "daily count table updated";
+
     }
   }
+  return 'daily consumption table was updated or created'
 }
 
 interface Consumption {
