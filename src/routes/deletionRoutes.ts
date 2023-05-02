@@ -23,38 +23,43 @@ router.get('/account', async(req, res) => {
 
 
 router.get('/deleteUser', async(req, res) => {
-    const token:string = (req.headers.cookie!.split('=')[1]);
-    const email:string = (wt.parseJwt(token)['email'])
-    const user = await db.findUser(email)
-    const UID:number = user!.user_id
-    db.deleteUser(UID)
-    return res
-    .clearCookie('email')
-    .clearCookie("access_token")
-    .redirect('/register')
+    try {
+        const token:string = (req.headers.cookie!.split('=')[1]);
+        const email:string = (wt.parseJwt(token)['email'])
+        const user = await db.findUser(email)
+        const UID:number = user!.user_id
+        db.deleteUser(UID)
+        return res
+        .clearCookie('email')
+        .clearCookie("access_token")
+        .redirect('/register')
+    } catch (error) {
+        console.error(error)
+    }
 
 })
 
-
 router.post('/accountSettings', async (req, res) => {
-    const token:string = (req.headers.cookie!.split('=')[1]);
-    const email:string = (wt.parseJwt(token)['email'])
-    console.log(email);
-    
-    const user = await db.findUser(email)
-    console.log(user);
-    
-    const UID: number = user!.user_id
-    const newEmail = req.body.email
-    const newPassword = req.body.password
-    await prisma.user.update({
-        where: {user_id:UID},
-        data: {
-            email: newEmail, 
-            password: newPassword
-        }
-    })
-    res 
-        .redirect('/logout')
+    try {
+        const token:string = (req.headers.cookie!.split('=')[1]);
+        const email:string = (wt.parseJwt(token)['email'])
+        const user = await db.findUser(email)
+        const UID: number = user!.user_id
+        const newEmail = req.body.email
+        const newPassword = req.body.password
+        
+        await prisma.user.update({
+            where: {user_id:UID},
+            data: {
+                email: newEmail, 
+                password: newPassword
+            }
+        })
+        res 
+            .redirect('/logout')
+        
+    } catch (error) {
+        console.error(error)
+    }
 })
 export default router 
