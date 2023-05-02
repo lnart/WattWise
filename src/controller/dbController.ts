@@ -2,7 +2,6 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient()
 
-
 interface dbUser {
     username: string,
     Email: string,
@@ -11,76 +10,97 @@ interface dbUser {
   }
 
 export async function createUser(user: dbUser){
-    const createdUser = await prisma.user.create({
-        data: {
-            username: user.username,
-            email: user.Email,
-            password: user.Password,
-            zipcode: user.Zipcode,
-        }
-    })
-    return createdUser
+    try {
+        const createdUser = await prisma.user.create({
+            data: {
+                username: user.username,
+                email: user.Email,
+                password: user.Password,
+                zipcode: user.Zipcode,
+            }
+        })
+        return createdUser
+    } catch (error) {
+        console.error(error)
+        throw new Error('user was not created')
+    }
 }
 
 export async function findUser(email: string){
-    const foundUser = await prisma.user.findFirst({
-        where: {
-            email: email
-        }
-    })
-    return foundUser
+    try {
+        const foundUser = await prisma.user.findFirst({
+            where: {
+                email: email
+            }
+        })
+        return foundUser
+    } catch (error) {
+        console.error(error)
+        throw new Error('User doesnt exist')
+    }
 }
 
 export async function deleteUser(UID:number) {
-    const user = await prisma.user.findUnique({
-        where: {
-            user_id: UID
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                user_id: UID
+            }
+        })
+        const counter = await prisma.counter.findMany({
+            where: {
+                user_id: UID
+            }
+        })
+        for(let i = 0; i < counter.length; i++){
+            const counterId = counter[i].counter_id
+    
+            
+            await prisma.dailyConsumption.deleteMany({
+                where: {
+                    counter_id: counterId
+                }
+            })
+            await prisma.weeklyConsumption.deleteMany({
+                where: {counter_id: counterId}
+            })
+            
+            await prisma.monthlyConsumption.deleteMany({
+                where: {
+                    counter_id: counterId
+                }
+            })
+            await prisma.monthlyConsumption.deleteMany({
+                where: {
+                    counter_id: counterId
+                }
+            })
+            await prisma.counter.delete({
+                where: {counter_id: counterId}
+            })
+    
+            await prisma.user.delete({
+                where: {user_id: UID}
+            })
         }
-    })
-    const counter = await prisma.counter.findMany({
-        where: {
-            user_id: UID
-        }
-    })
-    for(let i = 0; i < counter.length; i++){
-        const counterId = counter[i].counter_id
-
         
-        await prisma.dailyConsumption.deleteMany({
-            where: {
-                counter_id: counterId
-            }
-        })
-        await prisma.weeklyConsumption.deleteMany({
-            where: {counter_id: counterId}
-        })
-        
-        await prisma.monthlyConsumption.deleteMany({
-            where: {
-                counter_id: counterId
-            }
-        })
-        await prisma.monthlyConsumption.deleteMany({
-            where: {
-                counter_id: counterId
-            }
-        })
-        await prisma.counter.delete({
-            where: {counter_id: counterId}
-        })
-
-        await prisma.user.delete({
-            where: {user_id: UID}
-        })
+    } catch (error) {
+        console.error(error)
+        throw new Error('user was not deleted')
     }
 }
 
 export async function deleteTestUser(email:string){
-    await prisma.user.deleteMany({
-        where: {
-            email: email
-        }
-    })
+    try {
+        await prisma.user.deleteMany({
+            where: {
+                email: email
+            }
+        }) 
+    } catch (error) {
+        console.error(error)
+        throw new Error('test user was not deleted')
+    }
 }
 
 
