@@ -2,82 +2,10 @@
 <html>
 <head>
 	<title>Account Settings</title>
-	<style>
-		body {
-			background-color: rgba(37,50,56,255);
-			font-family: Arial, sans-serif;
-		}
-		.form {
-			background-color: rgba(255, 255, 255, 0.8);
-			width: 300px;
-			padding: 20px;
-			border-radius: 5px;
-			margin: auto;
-			margin-top: 100px;
-		}
-		h1 {
-			text-align: center;
-			color: rgba(55,72,79,255);
-		}
-		label {
-			display: block;
-			margin-bottom: 10px;
-			color: rgba(55,72,79,255);
-		}
-
-        .delete-btn{
-            background-color: red;
-            width: 43%;
-			padding: 10px;
-			border-radius: 5px;
-			border: none;
-			margin-bottom: 20px;
-            margin-top: 10px;
-			color: white;
-        }
-        
-		input[type="text"], input[type="password"] {
-            width: 100%;
-			padding: 10px;
-			border-radius: 5px;
-			border: none;
-			margin-bottom: 20px;
-			color: rgba(55,72,79,255);
-			background-color: white;
-		}
-		input[type="submit"] {
-			background-color: rgba(55,72,79,255);
-			color: white;
-			padding: 10px 20px;
-			border-radius: 5px;
-			border: none;
-			cursor: pointer;
-		}
-		input[type="submit"]:hover {
-			background-color: rgba(55,72,79,0.8);
-		}
-		.message{
-			color: red;
-		}
-
-        .confirm-btn{
-            background-color: rgba(55,72,79,255);
-			color: white;
-			padding: 10px 20px;
-			border-radius: 5px;
-			border: none;
-			cursor: pointer;
-        }
-
-        .delete-user-form{
-            display: inline;
-        }
-
-	</style>
+	<link rel="stylesheet" href="../../public/CSS/delete.css">
 </head>
 <body>
     <div class="form">
-
         <form method="post" action="/accountSettings">
             <h1 data-testid="headline">Account Settings</h1>
             <label for="email">Email:</label>
@@ -99,30 +27,26 @@
             <button class="confirm-btn">logout</button>
         </form>
     </div>
+
     <script>
 		const userEmail = JSON.stringify(email)
-function showPwd(){
-    let password = document.getElementById('password')
-    if(password.type === 'password'){
-        password.type = 'text'
-    }else password.type = 'password'
-}
-
+		function showPwd(){
+			let password = document.getElementById('password')
+			if(password.type === 'password'){
+				password.type = 'text'
+			}else password.type = 'password'
+		}
+		
         function showConfirmation() {
-        // Hide the delete button
         document.getElementById("delete-btn").style.display = "none";
-        // Show the confirmation dialog
         document.getElementById("confirmation-dialog").style.display = "block";
         }
         
         function hideConfirmation() {
-        // Show the delete button
         document.getElementById("delete-btn").style.display = "block";
-        // Hide the confirmation dialog
         document.getElementById("confirmation-dialog").style.display = "none";
         }
     
-        
     </script>
 </body>
 </html>

@@ -1,0 +1,44 @@
+body {
+    background-color: rgba(37,50,56,255);
+    font-family: Arial, sans-serif;
+}
+form {
+    background-color: rgba(255, 255, 255, 0.8);
+    width: 300px;
+    padding: 20px;
+    border-radius: 5px;
+    margin: auto;
+    margin-top: 100px;
+}
+h1 {
+    text-align: center;
+    color: rgba(55,72,79,255);
+}
+label {
+    display: block;
+    margin-bottom: 10px;
+    color: rgba(55,72,79,255);
+}
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    margin-bottom: 20px;
+    color: rgba(55,72,79,255);
+    background-color: white;
+}
+input[type="submit"] {
+    background-color: rgba(55,72,79,255);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+input[type="submit"]:hover {
+    background-color: rgba(55,72,79,0.8);
+}
+.message{
+    color: red;
+}
