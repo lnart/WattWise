@@ -4,44 +4,60 @@ import * as date from '../helpers/dateTimeHelpers'
 import { PrismaClient } from '@prisma/client'
 import dayjs from 'dayjs'
 
-// export async function executeSaveDailyCountsHourly(){
-//     const interval = 1 * (3.6 * 10**6)
-//     count.saveDailyCounts()
-//     setTimeout(executeSaveDailyCountsHourly, interval)
-// }
-
 const prisma = new PrismaClient
 
 export function executeEveryNewHour(){
-    const now = dayjs().utc()
-    const millisUntilNextHour = dayjs(now).endOf('hour').diff(now)
-
-    setTimeout(count.saveDailyCounts, millisUntilNextHour)
+    try {
+        const now = dayjs().utc()
+        const millisUntilNextHour = dayjs(now).endOf('hour').diff(now)
+        setTimeout(count.saveDailyCounts, millisUntilNextHour)
+    } catch (error) {
+        console.error(error)
+        throw new Error('daily counts were not saved')
+    }
 }
 
 export async function executeSaveWeeklyCountsDaily(){
-    const now  = dayjs().utc()    
-    const tablesOfToday = await read.readAllDailyConsumptionTables()
-    console.log(tablesOfToday);
-    if(now.isSame(now.endOf('day'))){
+    try {
+        const now  = dayjs().utc()    
+        const tablesOfToday = await read.readAllDailyConsumptionTables()
+        console.log(tablesOfToday);
+        if(now.isSame(now.endOf('day'))){
+            
+            const allCountsOfToday = await read.readAllCountsOfToday(tablesOfToday)
+            count.saveWeeklyCounts(allCountsOfToday)
+        }
         
-        const allCountsOfToday = await read.readAllCountsOfToday(tablesOfToday)
-        count.saveWeeklyCounts(allCountsOfToday)
+    } catch (error) {
+        console.error(error)
+        throw new Error('weekly counts were not saved')
     }
 }
 
 export async function executeSaveMonthlyCountsDaily(){
-    const now  = dayjs().utc()        
-    if(now.isSame(now.endOf('day'))){
-        const todaysCounts = await getTodaysTables()
-        count.saveMonthlyCounts(todaysCounts)
+    try {
+        const now  = dayjs().utc()        
+        if(now.isSame(now.endOf('day'))){
+            const todaysCounts = await getTodaysTables()
+            count.saveMonthlyCounts(todaysCounts)
+        }
+
+    } catch (error) {
+        console.error(error)
+        throw new Error('monthly counts were not saved')
     }
 }
 
 export async function getTodaysTables(){
-    const todaysCounts = await prisma.dailyConsumption.findMany({
-        where:{
-            consumption_date: date.getStartOfDayAsString()
-        }})
-        return todaysCounts
+    try {
+        const todaysCounts = await prisma.dailyConsumption.findMany({
+            where:{
+                consumption_date: date.getStartOfDayAsString()
+            }})
+            return todaysCounts
+        
+    } catch (error) {
+        console.error(error)
+        throw new Error('todays tables were not found')
+    }
 }
