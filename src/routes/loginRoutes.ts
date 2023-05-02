@@ -1,17 +1,13 @@
 import { Router } from "express";
-import { Express, request, response } from "express";
 import { createUser, findUser } from "../controller/dbController";
-import { Prisma, PrismaClient } from "@prisma/client";
 import * as login from '../controller/loginController'
-import * as db from '../controller/dbController'
-import * as count from '../controller/countController'
 import bcrypt from 'bcrypt'
 import Jwt from "jsonwebtoken";
 import { config } from 'dotenv'
 config()
 import * as wt from '../controller/webTokenController'
-import cookieParser, { signedCookie } from "cookie-parser";
-const prisma = new PrismaClient()
+import cookieParser from "cookie-parser";
+
 let router = Router()
 
 router.use(cookieParser());
