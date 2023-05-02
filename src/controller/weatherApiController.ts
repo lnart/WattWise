@@ -1,6 +1,3 @@
-import get from 'https'
-
-
 
 export async function getWeatherData(start: String, end: String) {
     try{
@@ -9,8 +6,6 @@ export async function getWeatherData(start: String, end: String) {
             throw new Error(`HTTP Error! Status: ${response.status}`);
         }
         let data = await response.json()
-        console.log(data);
-        
         return data
     }catch(error){
         console.error(error)
@@ -19,14 +14,17 @@ export async function getWeatherData(start: String, end: String) {
 }
 
 export async function formatWeatherData(start: String, end: String){
-    let data = await getWeatherData(start, end)
-    let formattedTemps = []
-    for(let i = 0; i < data.days.length; i++){
-        formattedTemps.push({datetime: data.days[i]['datetime'], tempmax: data.days[i]['tempmax'], tempmin: data.days[i]['tempmin']})
+    try {
+        let data = await getWeatherData(start, end)
+        let formattedTemps = []
+        for(let i = 0; i < data.days.length; i++){
+            formattedTemps.push({datetime: data.days[i]['datetime'], tempmax: data.days[i]['tempmax'], tempmin: data.days[i]['tempmin']})
+        }
+        return formattedTemps 
+        
+    } catch (error) {
+        console.error(error)
     }
-    console.log(formattedTemps);
-    
-    return formattedTemps 
 }
 
 module.exports = {
