@@ -4,6 +4,14 @@ import { getStartOfWeek } from "./customLocale";
 import * as date from "../helpers/dateTimeHelpers";
 const prisma = new PrismaClient();
 
+type allCounters = {
+  counter_id: number;
+  user_id: number;
+  type: string;
+  count: number;
+  timestamp: Date;
+}[];
+
 export async function saveLiveCount(
   UID: string,
   type: string,
@@ -39,7 +47,7 @@ export async function saveLiveCount(
 }
 
 export async function saveDailyCounts() {
-  const allCounters: any[] = await prisma.counter.findMany();
+  const allCounters: allCounters = await prisma.counter.findMany();  
   for (let i = 0; i < allCounters.length; i++) {
     const startOfDay: string = date.getStartOfDayAsString();
     const counterId: number = allCounters[i].counter_id;
