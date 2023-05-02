@@ -1,9 +1,6 @@
 import * as db from '../controller/dbController'
 import bcrypt from 'bcrypt'
-import Jwt from 'jsonwebtoken'
 import { config } from 'dotenv'
-import { userInfo } from 'os'
-import dayjs from 'dayjs'
 config()
 
 export async function checkIfUserExist(email: string){
