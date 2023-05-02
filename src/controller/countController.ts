@@ -1,8 +1,6 @@
-import { DailyConsumption, PrismaClient } from "@prisma/client"
+import {PrismaClient } from "@prisma/client"
 import dayjs, { utc } from 'dayjs'
 import { getStartOfWeek } from "./customLocale";
-import * as reader from './readController'
-import * as extract from '../helpers/extractHelpers'
 import * as date from '../helpers/dateTimeHelpers'
 const prisma = new PrismaClient()
 
