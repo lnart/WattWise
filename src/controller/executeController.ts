@@ -21,15 +21,17 @@ export function executeEveryNewHour(){
 
 export async function executeSaveWeeklyCountsDaily(){
     const now  = dayjs().utc()    
+    const tablesOfToday = await read.readAllDailyConsumptionTables()
+    console.log(tablesOfToday);
     if(now.isSame(now.endOf('day'))){
-        const tablesOfToday = await read.readAllDailyConsumptionTables()
+        
         const allCountsOfToday = await read.readAllCountsOfToday(tablesOfToday)
         count.saveWeeklyCounts(allCountsOfToday)
     }
 }
 
 export async function executeSaveMonthlyCountsDaily(){
-    const now  = dayjs().utc()    
+    const now  = dayjs().utc()        
     if(now.isSame(now.endOf('day'))){
         const todaysCounts = await getTodaysTables()
         count.saveMonthlyCounts(todaysCounts)
