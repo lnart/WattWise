@@ -129,37 +129,42 @@ export async function saveWeeklyCounts(allCountsOfToday: allCountsOfToday) {
   return 'weekly counts table updated or created'
 }
 
-export async function saveMonthlyCounts(todaysCounts: any[]) {
-  for (let i = 0; i < todaysCounts.length; i++) {
-    const counterId = todaysCounts[i].counter_id;
-    const lastItem = todaysCounts[i].consumption_counts.length - 1;
-    const startOfCurrentMonth = dayjs().utc().startOf("month").toDate();
-    const todaysConsumption =
-      todaysCounts[i].consumption_counts[lastItem] -
-      todaysCounts[i].consumption_counts[0];
-    const currentMonthsTable = await prisma.monthlyConsumption.findFirst({
-      where: { counter_id: counterId, consumption_month: startOfCurrentMonth },
-    });
-
-    if (currentMonthsTable) {
-      const consumptionId = currentMonthsTable.consumption_id;
-      const arrayOfMonthlyCounts = currentMonthsTable.consumption_month_counts;
-      arrayOfMonthlyCounts.push(todaysConsumption);
-      await prisma.monthlyConsumption.update({
-        where: { consumption_id: consumptionId },
-        data: { consumption_month_counts: arrayOfMonthlyCounts },
+export async function saveMonthlyCounts(todaysCounts: allCountsOfToday) {
+  try {
+    for (let i = 0; i < todaysCounts.length; i++) {
+      const counterId = todaysCounts[i].counter_id;
+      const lastCountIndex = todaysCounts[i].consumption_counts.length - 1;
+      const startOfCurrentMonth = dayjs().utc().startOf("month").toDate();
+      const todaysConsumption =
+        todaysCounts[i].consumption_counts[lastCountIndex] -
+        todaysCounts[i].consumption_counts[0];
+      const currentMonthsTable = await prisma.monthlyConsumption.findFirst({
+        where: { counter_id: counterId, consumption_month: startOfCurrentMonth },
       });
-      return "monthly consumption table updated";
-    } else {
-      await prisma.monthlyConsumption.create({
-        data: {
-          counter_id: counterId,
-          consumption_month_counts: todaysConsumption,
-          consumption_month: startOfCurrentMonth,
-        },
-      });
-      return "monthly consumption table created";
+  
+      if (currentMonthsTable) {
+        const consumptionId = currentMonthsTable.consumption_id;
+        const arrayOfMonthlyCounts = currentMonthsTable.consumption_month_counts;
+        arrayOfMonthlyCounts.push(todaysConsumption);
+        await prisma.monthlyConsumption.update({
+          where: { consumption_id: consumptionId },
+          data: { consumption_month_counts: arrayOfMonthlyCounts },
+        });
+      } else {
+        await prisma.monthlyConsumption.create({
+          data: {
+            counter_id: counterId,
+            consumption_month_counts: todaysConsumption,
+            consumption_month: startOfCurrentMonth,
+          },
+        });
+      }
     }
+    return 'monthly consumption table created or updated'
+    
+  } catch (error) {
+    console.error(error)
+    throw new Error("failed to save monthly count")
   }
 }
 
