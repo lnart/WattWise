@@ -21,7 +21,6 @@ export async function executeSaveWeeklyCountsDaily(){
     try {
         const now  = dayjs().utc()    
         const tablesOfToday = await read.readAllDailyConsumptionTables()
-        console.log(tablesOfToday);
         if(now.isSame(now.endOf('day'))){
             
             const allCountsOfToday = await read.readAllCountsOfToday(tablesOfToday)
