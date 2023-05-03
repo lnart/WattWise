@@ -49,13 +49,6 @@ setInterval(execute.executeSaveWeeklyCountsDaily, 1000)
 execute.executeSaveMonthlyCountsDaily()
 setInterval(execute.executeSaveMonthlyCountsDaily, 1000)
 
-async function x() {
- 
- const dongs = await reader.getyAxisYear(2, 'gas')
-   console.log(dongs); 
-  }
-x()
- 
  
 app.listen(process.env.PORT, () => {
     console.log(`STARTED SERVER ON PORT ${process.env.PORT}`); 
