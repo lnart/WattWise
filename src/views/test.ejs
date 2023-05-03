@@ -1,234 +1,265 @@
 <head>
-  <link rel="stylesheet" href="public/CSS/index.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="public/CSS/index.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
+    rel="stylesheet"
+  />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
-<title>Dashboard</title>
+  <title>Dashboard</title>
 </head>
 <body>
-
   <div class="angry-grid">
-    <div id="item-0">&nbsp;
-      
+    <div id="item-0">
+      &nbsp;
       <div class="header">
         <div class="user-settings-btn">
           <form action="/account">
             <button data-testid="userSettings">User Settings</button>
           </form>
-      </div>
         </div>
+      </div>
     </div>
-    <div id="item-1" class="side-bar">&nbsp;
+    <div id="item-1" class="side-bar">
+      &nbsp;
       <div class="side-bar-buttons">
         <div class="button-1">
-          <button><img src="public/icons/menu.png" alt="toolbar"></button>    
+          <button><img src="public/icons/menu.png" alt="toolbar" /></button>
         </div>
         <div class="button-2">
-          <button><img src="public/icons/gas-2.png" alt="gas icon"></button>
+          <button><img src="public/icons/gas-2.png" alt="gas icon" /></button>
         </div>
         <div class="button-3">
-          <button><img src="public/icons/flash-2.png" alt="flash icon"></button>
+          <button>
+            <img src="public/icons/flash-2.png" alt="flash icon" />
+          </button>
         </div>
         <div class="button-4">
-          <button><img src="public/icons/water-drop-2.png"></button>
+          <button><img src="public/icons/water-drop-2.png" /></button>
         </div>
       </div>
     </div>
-    <div id="item-2">&nbsp;
-        <div class="daychart">
-          <canvas id="day-chart"></canvas>
-        </div>
+    <div id="item-2">
+      &nbsp;
+      <div class="daychart">
+        <canvas id="day-chart"></canvas>
       </div>
-        <div id="item-3">&nbsp;
-          <div class="timespan-buttons">
-            <button class="timespan-button day" id="day">Day</button>
-            <button class="timespan-button" id="week">Week</button>
-            <button class="timespan-button" id="month">Month</button>
-            <button class="timespan-button" id="year">Year</button>
-          </div>
-          <div class="big-chart">
-            <canvas id="bigChart"></canvas>
-          </div>
-        </div>
-        <div id="item-4">&nbsp;
-          <div class="daily-average">
-            <canvas id="daily-average-barchart"></canvas>
-          </div>
+    </div>
+    <div id="item-3">
+      &nbsp;
+      <div class="timespan-buttons">
+        <button class="timespan-button day" id="day">Day</button>
+        <button class="timespan-button" id="week" >
+          Week
+        </button>
+        <button
+          class="timespan-button"
+          id="month"
+          onclick="updateChart('month')"
+        >
+          Month
+        </button>
+        <button class="timespan-button" id="year" onclick="updateChart('year')">
+          Year
+        </button>
+      </div>
+      <div class="big-chart">
+        <canvas id="bigChart"></canvas>
+      </div>
+    </div>
+    <div id="item-4">
+      &nbsp;
+      <div class="daily-average">
+        <canvas id="daily-average-barchart"></canvas>
+      </div>
+    </div>
+    <div id="item-5">
+      &nbsp;
+      <div class="load-bar"></div>
+    </div>
+    <div id="item-6">&nbsp;</div>
+    <div id="item-7">&nbsp;</div>
+  </div>
 
-        </div>
-        <div id="item-5">&nbsp;
-          <div class="load-bar"></div>
-        </div>
-        <div id="item-6">&nbsp;
-        </div>
-        <div id="item-7">&nbsp;
-  
-        </div>
-        </div>
-  
-<script>
-  const buttons = document.querySelectorAll(".timespan-button");
-  const defaultColor = "white";
-  const activeColor = "rgba(75,207,250,255)";
-  
-  buttons.forEach((button) => {
-    button.addEventListener("click", () => {
-      buttons.forEach((button) => {
-        button.style.backgroundColor = defaultColor;
+  <script>
+    const buttons = document.querySelectorAll(".timespan-button");
+    const defaultColor = "white";
+    const activeColor = "rgba(75,207,250,255)";
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        buttons.forEach((button) => {
+          button.style.backgroundColor = defaultColor;
+        });
+        button.style.backgroundColor = activeColor;
       });
-      button.style.backgroundColor = activeColor;
     });
-  });
-  
-</script>
 
-<script>
-  const ctc = document.getElementById('daily-average-barchart');
-  new Chart(ctc, {
-    type: 'bar',
-    data: {
-      labels: ['Today'],
-      datasets: [{
-        fill: true,
-        label: '',
-        data: [16], 
-        borderWidth: 1,
-      }]
-      
-    },
-    options: {
+    const ctc = document.getElementById("daily-average-barchart");
+    new Chart(ctc, {
+      type: "bar",
+      data: {
+        labels: ["Today"],
+        datasets: [
+          {
+            fill: true,
+            label: "",
+            data: [16],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+
+    const dayY = JSON.parse(`<%- JSON.stringify(dayYGas) %>`);
+    const dayX = [
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+      22, 23, 24,
+    ];
+
+    const chartData = {
+      labels: dayX,
+      datasets: [
+        {
+          label: "Day",
+          data: dayY,
+          fill: false,
+          borderColor: "rgb(75, 192, 192)",
+          tension: 0.1,
+        },
+      ],
+    };
+
+    const chartOptions = {
       scales: {
-        y: {
-          beginAtZero: true
-        }
+        yAxes: [
+          {
+            ticks: {
+              beginAtZero: true,
+            },
+          },
+        ],
+      },
+    };
+
+    const bigChart = new Chart(document.getElementById("bigChart"), {
+      type: "line",
+      data: chartData,
+      options: chartOptions,
+    });
+
+    function updateChart(option) {
+      const biggie = document.getElementById("bigChart");
+      let xData, yData, label;
+      const monthX = [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+        22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+      ];
+      const yearX = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+      const weekX = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ];
+      const dayY = JSON.parse("<%- JSON.stringify(dayYGas) %>");
+      const weekY = JSON.parse("<%- JSON.stringify(weekYGas) %>");
+      const monthY = JSON.parse("<%- JSON.stringify(monthYGas) %>");
+      const yearY = JSON.parse("<%- JSON.stringify(yearYGas) %>")
+
+      switch (option) {
+        case "day":
+          xData = dayX;
+          yData = dayY;
+
+          label = "Day";
+          break;
+        case "week":
+          xData = weekX;
+          yData = weekY;
+          label = "Week";
+          break;
+        case "month":
+          xData = monthX;
+          yData = monthY;
+          label = "Month";
+          break;
+        case "year":
+          xData = yearX;
+          yData = yearY;
+          label = "Year";
+          break;
+        default:
+          break;
       }
+
+      bigChart.data.labels = xData;
+      bigChart.data.datasets[0].data = yData;
+      bigChart.data.datasets[0].label = label;
+      bigChart.update();
     }
-  });
-</script>
 
-<script>
-  const dayY = JSON.parse(`<%- JSON.stringify(dayYGas) %>`)
-  const dayX = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
+    document.getElementById("day").addEventListener("click", function () {
+      updateChart("day");
+    });
 
+    document.getElementById("week").addEventListener("click", function () {
+      updateChart("week");
+    });
 
-const chartData = {
-  labels: dayX,
-  datasets: [
-    {
-      label: 'Day',
-      data: dayY,
-      fill: false,
-      borderColor: 'rgb(75, 192, 192)',
-      tension: 0.1
-    }
-  ]
-};
+    document.getElementById("month").addEventListener("click", function () {
+      updateChart("month");
+    });
 
-const chartOptions = {
-  scales: {
-    yAxes: [
-      {
-        ticks: {
-          beginAtZero: true
-        }
-      }
-    ]
-  }
-};
+    document.getElementById("year").addEventListener("click", function () {
+      updateChart("year");
+    });
 
-const bigChart = new Chart(document.getElementById('bigChart'), {
-  type: 'line',
-  data: chartData,
-  options: chartOptions
-});
+    const ctx = document.getElementById("day-chart");
+    const weekY = JSON.parse(`<%- JSON.stringify(weekYGas)%>`);
 
-
-
-  const weekY = JSON.parse(`<%- JSON.stringify(weekYGas) %>`)
-  const monthY = JSON.parse(`<%- JSON.stringify(monthYGas) %>`)
-  const yearY = JSON.parse(`<%- JSON.stringify(yearYGas) %>`)
-
-  const weekX = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-  const monthX = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ,21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]
-  const yearX = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-  function updateChart(option){
-    const biggie = document.getElementById('bigChart')
-    let xData, yData, label
-    switch(option){
-      case "day":
-      xData = dayX;
-      yData = dayY;
-      label = 'Day'
-      break;
-    case "week":
-      xData = weekX;
-      yData = weekY;
-      label = 'Week'
-      break;
-    case "month":
-      xData = monthX;
-      yData = monthY;
-      label = 'Month'
-      break;
-    case "year":
-      xData = yearX;
-      yData = yearY;
-      label = 'Year'
-      break;
-    default:
-      break;
-    }
-    bigChart.data.labels = xData
-    bigChart.data.datasets[0].data = yData
-    bigChart.data.datasets[0].label = label
-    bigChart.update();
-  }
-
-  document.getElementById("day").addEventListener("click", function() {
-  updateChart("day");
-});
-
-document.getElementById("week").addEventListener("click", function() {
-  updateChart("week");
-});
-
-document.getElementById("month").addEventListener("click", function() {
-  updateChart("month");
-});
-
-document.getElementById("year").addEventListener("click", function() {
-  updateChart("year");
-});
-
-</script>
-
-<script>
-  
-  const ctx = document.getElementById('day-chart');
-  new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-    datasets: [{
-      fill: true,
-      label: 'Daily Average',
-      data: weekY , 
-      borderWidth: 1,
-      // fill: true,
-      backgroundColor: '',
-      borderColor: 'rgba(75,207,250,255)',
-
-    }]
-  
-  },
-  options: {
-    scales: {
-      y: {
-        beginAtZero: true
-      }
-    }
-  }
-  });
-</script>
+    new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday",
+        ],
+        datasets: [
+          {
+            fill: true,
+            label: "Daily Average",
+            data: weekY,
+            borderWidth: 1,
+            // fill: true,
+            backgroundColor: "",
+            borderColor: "rgba(75,207,250,255)",
+          },
+        ],
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  </script>
 </body>
