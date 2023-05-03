@@ -1,7 +1,3 @@
-
-
-
-
 export function extractUserIdFromTopic(topic:string){
     const UID = topic.split('/')[1]
     return UID

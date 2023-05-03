@@ -17,6 +17,7 @@ router.get('/',wt.authorization, async(req, res) => {
         const gasCounts = await reader.readConsumptionCounts(UID, 'gas')
         const electricityCounts = await reader.readConsumptionCounts(UID, 'electricity')
         const waterCounts = await reader.readConsumptionCounts(UID, 'water')
+        console.log(gasCounts.yAxisDay);
         
         res.render('test', {
             email:email,

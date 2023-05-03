@@ -79,12 +79,16 @@ export async function getYaxisWeek(UID:number, type: string){
         if(counter){
             const counterId:number = counter.counter_id
             const currentWeek = getNextDay(dayjs().startOf('week').utc().toDate()).toISOString()
+            console.log(currentWeek);
+            
             const tableOfTheWeek = await prisma.weeklyConsumption.findFirst({
                 where: {
                     counter_id: counterId,
                     consumption_week_start:currentWeek
                 }
             })
+            console.log(tableOfTheWeek?.consumption_week_counts);
+            
             return tableOfTheWeek?.consumption_week_counts
             
         }
