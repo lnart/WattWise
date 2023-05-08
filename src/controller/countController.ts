@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import dayjs, { utc } from "dayjs";
 import { getStartOfWeek } from "./customLocale";
+import * as dbHelper from '../helpers/dbHelpers'
 import * as date from "../helpers/dateTimeHelpers";
 const prisma = new PrismaClient();
 
@@ -35,9 +36,7 @@ export async function saveLiveCount(
   count: string
 ) {
   try {
-    const counter = await prisma.counter.findFirst({
-      where: { user_id: +UID, type: type },
-    });
+    const counter = await dbHelper.findCounter(UID, type)
     if (!counter) {
       await prisma.counter.create({
         data: {
@@ -63,7 +62,7 @@ export async function saveLiveCount(
     }
   } catch (error) {
     console.error(error)
-    throw new Error('didnt save live count')
+    return 'didnt save live count'
   }
 }
 
