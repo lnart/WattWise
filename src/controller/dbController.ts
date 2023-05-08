@@ -19,7 +19,7 @@ export async function createUser(user: dbUser){
                 zipcode: user.Zipcode,
             }
         })
-        return createdUser
+        return 'user was created'
     } catch (error) {
         console.error(error)
         throw new Error('user was not created')
