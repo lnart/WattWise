@@ -5,14 +5,21 @@ import dayjs from "dayjs";
 const prisma = new PrismaClient
 
 export async function createCounter(UID:number, type: string){
-    await prisma.counter.create({
-        data: {
-            user_id: UID,
-            type: type,
-            count: 0,
-            timestamp: dayjs().utc().toDate()
-        }
-    })
+    try {
+        const counter = await prisma.counter.create({
+            data: {
+                user_id: UID,
+                type: type,
+                count: 0,
+                timestamp: dayjs().utc().toDate()
+            }
+        })
+        return `counter ${counter.counter_id} was created`
+    } catch (error) {
+        console.error(error)
+        return 'counter was not created'
+    }
+
 }
 
 export async function deleteCounter(counterId:number){
