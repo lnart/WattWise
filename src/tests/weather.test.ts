@@ -3,6 +3,7 @@ import * as weather from '../controller/weatherApiController'
 import { format } from "path";
 
 test('formats weather data', async ()=>{
+
         const result = await weather.formatWeatherData('2023-03-12', '2023-3-13')
         expect(result).toBeDefined()
         expect(result).toHaveLength(2)
