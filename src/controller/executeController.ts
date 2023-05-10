@@ -13,13 +13,13 @@ export function executeEveryNewHour(){
         setTimeout(count.saveDailyCounts, millisUntilNextHour)
     } catch (error) {
         console.error(error)
-        throw new Error('daily counts were not saved')
+        return 'daily counts were not saved'
     }
 }
 
 export async function executeSaveWeeklyCountsDaily(){
     try {
-        const now  = dayjs().utc()    
+        const now  = dayjs().utc()
         const tablesOfToday = await read.readAllDailyConsumptionTables()
         if(now.isSame(now.endOf('day'))){
             

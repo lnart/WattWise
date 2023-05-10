@@ -22,7 +22,7 @@ export async function createUser(user: dbUser){
         return 'user was created'
     } catch (error) {
         console.error(error)
-        throw new Error('user was not created')
+        return 'user was not created'
     }
 }
 
@@ -33,10 +33,13 @@ export async function findUser(email: string){
                 email: email
             }
         })
+        if(!foundUser){
+            return 'user doesnt exist'
+        }
         return foundUser
     } catch (error) {
         console.error(error)
-        throw new Error('User doesnt exist')
+        return 'incorrect argument'
     }
 }
 
