@@ -34,12 +34,12 @@ export async function findUser(email: string){
             }
         })
         if(!foundUser){
-            return 'user doesnt exist'
+            return null
         }
         return foundUser
     } catch (error) {
         console.error(error)
-        return 'incorrect argument'
+        throw new Error('incorrect argument')
     }
 }
 
@@ -106,4 +106,4 @@ export async function deleteTestUser(email:string){
     }
 }
 
-
+ 
