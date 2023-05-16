@@ -6,10 +6,14 @@ import dayjs from 'dayjs'
 
 const prisma = new PrismaClient
 
+export function now(){
+    return dayjs().utc()
+}
+
 export function executeEveryNewHour(){
     try {
-        const now = dayjs().utc()
-        const millisUntilNextHour = dayjs(now).endOf('hour').diff(now)
+        const time = now()
+        const millisUntilNextHour = dayjs(time).endOf('hour').diff(time)
         setTimeout(count.saveDailyCounts, millisUntilNextHour)
     } catch (error) {
         console.error(error)
@@ -60,3 +64,4 @@ export async function getTodaysTables(){
         throw new Error('todays tables were not found')
     }
 }
+
